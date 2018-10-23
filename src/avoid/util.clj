@@ -9,7 +9,7 @@
   (map (partial * s) v))
 
 (defn vector-plus [& vectors]
-  (apply (partial map +) vectors))
+  (vec (apply (partial map +) vectors)))
 
 (defn vector-minus [& vectors]
   (apply (partial map -) vectors))

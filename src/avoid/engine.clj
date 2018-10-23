@@ -25,7 +25,7 @@
   [(mod x 256) (mod y 256) 255])
 
 (defn create-update-fn [field func]
-  (fn [game other-objects object] (assoc object field (func {:game game :other-objects other-objects :object object}))))
+  (fn [game input-key other-objects object] (assoc object field (func {:game game :input-key input-key :other-objects other-objects :object object}))))
 
 (defn without-object [objects {:keys [id]}]
   (filter (comp (partial not= id) :id) objects))
@@ -73,25 +73,6 @@
                  c-direction))
       direction)))
 
-(defn get-circle-object
-  ([position direction radius] (get-circle-object position direction radius [100 255 255]))
-  ([position direction radius color]
-   {:id (gensym)
-    :position position
-    :direction direction
-    :radius radius
-    :color color
-    :update
-    [(create-update-fn :color (comp get-color-by-vector :position :object))
-     (create-update-fn :direction (fn [{:keys [other-objects object]}] (get-direction-after-collision other-objects object)))
-     (create-update-fn :direction (fn [{:keys [game object]}]
-                                    (bounce-edges game (:position object) (:direction object) (:radius object))))
-     (create-update-fn :direction (comp gravity :direction :object))]
-    :destruction-predicates [(constantly false)]}))
-
-(defn survive-update? [{:keys [:destruction-predicates] :as object}]
-  (not ((apply some-fn destruction-predicates) object)))
-
 (defn find-earliest-collision-time [objects]
   (reduce
    (fn [earliest [a b]]
@@ -132,25 +113,29 @@
    []
    objects))
 
-(defn update-objects [game-size objects]
+(defn update-objects [game-size input-key objects]
   (let
    [updated-objects
     (reduce
      (fn [new-objects object]
        (let [other-objects (concat new-objects (drop (inc (count new-objects)) objects))
              updated-object (reduce
-                             (fn [o f] (f game-size other-objects o))
+                             (fn [o update-fn]
+                               (let [next-o (update-fn game-size input-key other-objects o)]
+                                 (if (some? next-o) next-o (reduced o))))
                              object
-                             (:update object))]
-         (cons updated-object new-objects)))
+                             (:update-fns object))]
+         (if (some? updated-object)
+           (cons updated-object new-objects)
+           new-objects)))
      []
      objects)]
     (vec updated-objects)))
 
 (defn update-tick2
-  ([game-size objects] (update-tick2 game-size objects 1.0))
-  ([game-size objects time-left] (update-tick2 game-size objects time-left 0.0025))
-  ([game-size objects time-left min-tick]
+  ([game-size input-key objects] (update-tick2 game-size input-key objects 1.0))
+  ([game-size input-key objects time-left] (update-tick2 game-size input-key objects time-left 0.0025))
+  ([game-size input-key objects time-left min-tick]
    (if (< time-left min-tick)
      objects
      (let
@@ -158,20 +143,54 @@
        earliest-edge-bounce (find-earliest-edge-collision game-size objects)
        time-step (apply (partial min time-left) (filter (every-pred some? pos?) [earliest-collision-time earliest-edge-bounce]))
        moved-objects (move-objects game-size time-step objects)
-       updated-objects (update-objects game-size moved-objects)]
-       (update-tick2 game-size updated-objects (- time-left time-step))))))
+       updated-objects (update-objects game-size input-key moved-objects)]
+       (update-tick2 game-size nil updated-objects (- time-left time-step))))))
 
-(defn update-tick [game-size key objects]
-  (update-tick2 game-size (map (fn [object] ((:key-handler object) object key)) objects)))
+(defn update-tick [game-size input-key objects]
+  (update-tick2 game-size input-key objects))
 
-(defn create-random-circle [[width height] objects]
-  (let [; radius (+ 10 (rand-int 20))
-        radius 20
-        new-circle (get-circle-object
-                    [(max radius (rand-int (- width radius))) (max radius (rand-int (- height radius)))]
-                    ; [(+ -1 (rand 2)) (+ -1 (rand 2))]
-                    [1.0 1.0]
-                    radius)]
-    (if (overlapping-any? objects new-circle)
-      (create-random-circle [width height] objects)
-      new-circle)))
+(defn multiply-direction [object]
+  (assoc object :direction (map (partial * 0.99) (:direction object))))
+
+(defn add-direction [direction object]
+  (assoc object :direction (map + (:direction object) direction)))
+
+(defn handle-player-action [{:keys [direction]} action]
+  (let [new-direction (cond
+                        (= action :up) (vector-plus [0 0.2] direction)
+                        (= action :down) (vector-plus [0 -0.2] direction)
+                        (= action :left) (vector-plus [-0.2 0] direction)
+                        (= action :right) (vector-plus [0.2 0] direction)
+                        :else direction)]
+    new-direction))
+
+(defn create-player [color]
+  {:position [100 100] :direction [1 1] :radius 20 :color color
+   :update-fns [(create-update-fn :direction (fn [{:keys [object input-key]}] (handle-player-action object input-key)))
+                (fn [game-size input-key other-objects player] (multiply-direction player))
+                (create-update-fn :direction (fn [{:keys [game object]}]
+                                               (bounce-edges game (:position object) (:direction object) (:radius object))))]})
+
+(defn create-circle [position radius]
+  {:position position :radius radius :direction [0 -2] :color [255 100 100]
+   :update-fns []})
+
+(defn find-opening-for-circle
+  ([[width height] radius objects] (find-opening-for-circle [width height] radius objects 10))
+  ([[width height] radius objects attempts]
+   (let [position
+         [(+ radius (rand-int (- width (* 2 radius)))) (+ radius (rand-int (- height (* 2 radius))))]]
+     (if (overlapping-any? objects {:position position :radius radius :id (gensym)})
+       position
+       (if (< attempts 10)
+         (find-opening-for-circle [width height] radius objects (inc attempts)))))))
+
+(defn add-random-circle [[width height] objects]
+  (let [radius 10 color [255 0 255]
+        position (find-opening-for-circle [width height] radius objects)]
+    (if (some? position)
+      (cons (create-circle position radius) objects)
+      objects)))
+
+(defn setup []
+  [(create-player [255 255 100])])

@@ -4,31 +4,10 @@
             [avoid.engine :as engine]
             [avoid.settings :as settings]))
 
-(defn multiply-direction [object]
-  (assoc object :direction (map (partial * 0.99) (:direction object))))
-
-(defn add-direction [direction object]
-  (assoc object :direction (map + (:direction object) direction)))
-
-(defn handle-player-action [player action]
-  (cond
-    (= action :up) (add-direction [0 0.2] player)
-    (= action :down) (add-direction [0 -0.2] player)
-    (= action :left) (add-direction [-0.2 0] player)
-    (= action :right) (add-direction [0.2 0] player)
-    :else player))
-
 (defn setup []
   (q/frame-rate @settings/frame-rate)
   (q/color-mode :hsb)
-  [{:position [100 100] :direction [1 1] :radius 20
-    :update [(fn [game-size other-objects player] (multiply-direction player))
-             (engine/create-update-fn :direction (fn [{:keys [game object]}]
-                                                   (engine/bounce-edges game (:position object) (:direction object) (:radius object))))]
-    :on-object-collision (fn [object other-object] (println "lose") object)
-    :on-edge-collision nil
-    :key-handler handle-player-action
-    :color [255 255 200]}])
+  (engine/setup))
 
 (defn get-key-input []
   (if (q/key-pressed?) (q/key-as-keyword)))
