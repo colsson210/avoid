@@ -7,7 +7,7 @@
 (defn setup []
   (q/frame-rate @settings/frame-rate)
   (q/color-mode :hsb)
-  (engine/setup))
+  (engine/setup [settings/window-width settings/window-height]))
 
 (defn get-key-input []
   (if (q/key-pressed?) (q/key-as-keyword)))
@@ -38,6 +38,7 @@
     (dorun
      (for [{:keys [position radius color]} state]
        (draw-circle position radius color)))))
+
 
 (defn -main [& args]
   (q/defsketch avoid
