@@ -1,6 +1,7 @@
 (ns avoid.engine
   (:require [avoid.util :refer :all]
             [avoid.update :as update]
+            [avoid.destroy :as destroy]
             [clojure.math.combinatorics :as combinatorics]))
 
 (defn gravity [[x y]]
@@ -146,60 +147,55 @@
        updated-objects (update-objects game-size input-key moved-objects)]
        (update-tick2 game-size nil updated-objects (- time-left time-step))))))
 
-(defn update-tick [game-size input-key objects]
-  (update-tick2 game-size input-key objects))
-
-(defn multiply-direction [object]
-  (assoc object :direction (map (partial * 0.99) (:direction object))))
-
-(defn add-direction [direction object]
-  (assoc object :direction (map + (:direction object) direction)))
-
-(defn create-destroy-fn [pred]
-  (fn [game-size input-key other-objects object]
-    (if
-     (pred {:game-size game-size
-            :input-key input-key
-            :other-objects other-objects
-            :object object})
-      object)))
-
 (def destroy-on-exit-bottom
-  (create-destroy-fn
-   (fn [{:keys [object]}]
-     (let [{:keys [position radius]} object [x y] position]
-       (if (> y radius) object)))))
+  (destroy/create-destroy
+   (let [[x y] position] (<= y radius))))
 
-(defn hpa [{:keys [direction]} action]
-  (let [new-direction (cond
-                        (= action :up) (vector-plus [0 0.2] direction)
-                        (= action :down) (vector-plus [0 -0.2] direction)
-                        (= action :left) (vector-plus [-0.2 0] direction)
-                        (= action :right) (vector-plus [0.2 0] direction)
-                        :else direction)]
-    new-direction))
+(def destroy-on-collision
+  (destroy/create-destroy (get-collision-object other-objects object 0.1)))
 
-(def handle-player-action (update/create-update :direction (hpa object input-key)))
-(def decrease-direction (update/create-update :direction (scalar-vector-multiplication 0.99 (:direction object))))
-(def bounce-edges-update (update/create-update :direction (bounce-edges game (:position object) (:direction object) (:radius object))))
+(defn hpa [direction action]
+  (cond
+    (= action :up) (vector-plus [0 0.2] direction)
+    (= action :down) (vector-plus [0 -0.2] direction)
+    (= action :left) (vector-plus [-0.2 0] direction)
+    (= action :right) (vector-plus [0.2 0] direction)
+    :else direction))
+
+(def handle-player-action (update/create-update :direction (hpa direction input-key)))
+(def decrease-direction (update/create-update :direction (scalar-vector-multiplication 0.99 direction)))
+(def bounce-edges-update (update/create-update :direction (bounce-edges game position direction radius)))
+(def color-by-position (update/create-update :color (get-color-by-vector position)))
+(def take-color-on-collision
+  (update/create-update
+   :color
+   (let [co (get-collision-object other-objects object 0.1)]
+     (if co (:color co) color))))
+
+(def collision-counter
+  (update/create-update
+   :collisions
+   (if (get-collision-object other-objects object 0.1)
+     (do (println "prev collisions" collisions) (inc collisions))
+     collisions)))
+
+(defn create-object [& object-fields]
+  (apply (partial merge {:id (gensym)}) object-fields))
 
 (defn create-player [color]
-  {:id (gensym)
-   :position [100 100] :direction [1 1] :radius 20 :color color
-   :update-fns [handle-player-action
-                decrease-direction
-              bounce-edges-update
-                ; (update/create-update-fn :direction (fn [{:keys [game object]}]
-                ;                                       (bounce-edges game (:position object) (:direction object) (:radius object))))
-                (update/create-update-fn :color (fn [{:keys [object other-objects]}]
-                                                  (let [co (get-collision-object other-objects object 0.1)]
-                                                    (if co (println "co" co))
-                                                    (if co (:color co) (:color object)))))]})
+  (create-object
+   {:position [100 100] :direction [1 1] :radius 20 :color color
+    :collisions 0
+    :update-fns [handle-player-action
+                 decrease-direction
+                 bounce-edges-update
+                 take-color-on-collision
+                 collision-counter]}))
 
 (defn create-circle [position radius]
-  {:position position :radius radius :direction [0 -1] :color [255 100 100]
-   :update-fns [(update/create-update-fn :color (fn [{:keys [object]}] (get-color-by-vector (:position object))))
-                destroy-on-exit-bottom]})
+  (create-object
+   {:position position :radius radius :direction [0 -1] :color [255 100 100]
+    :update-fns [color-by-position destroy-on-exit-bottom destroy-on-collision]}))
 
 (defn find-opening-for-circle
   ([[width height] radius objects] (find-opening-for-circle [width height] radius objects 0))
@@ -212,11 +208,16 @@
          (find-opening-for-circle [width height] radius objects (inc attempts)))))))
 
 (defn add-random-circle [[width height] objects]
-  (let [radius 10 color [255 0 255]
-        position (find-opening-for-circle [width height] radius objects)]
-    (if (some? position)
-      (cons (create-circle position radius) objects)
-      objects)))
+  (if (>= (count objects) 10)
+    objects
+    (let [radius 10 color [255 100 255]
+          position (find-opening-for-circle [width height] radius objects)]
+      (if (some? position)
+        (cons (create-circle position radius) objects)
+        objects))))
+
+(defn update-tick [game-size input-key objects]
+  (->> (update-tick2 game-size input-key objects) (add-random-circle game-size)))
 
 (defn setup [[width height]]
   (add-random-circle [width height] [(create-player [255 255 100])]))

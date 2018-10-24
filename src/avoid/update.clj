@@ -10,6 +10,6 @@
 (defmacro create-update [update-key & body]
   `(create-update-fn
     ~update-key
-    (fn [{:keys [~'game ~'input-key ~'other-objects ~'object]}] (do ~@body))))
-
-
+    (fn [{:keys [~'game ~'input-key ~'other-objects ~'object]}]
+      (let [{:keys [~'direction ~'position ~'radius ~'color ~'collisions]} ~'object]
+        (do ~@body)))))
