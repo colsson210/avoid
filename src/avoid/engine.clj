@@ -114,24 +114,35 @@
    []
    objects))
 
-(defn update-objects [game-size input-key objects]
+
+(defn update-object [game-size input-key other-objects object]
+  (reduce
+    (fn [current-object update-fn]
+      (let [next-object (update-fn game-size input-key other-objects current-object)]
+        (if (some? next-object) next-object (reduced nil))))
+    object
+    (:update-fns object)))
+
+(defn update-objects-sequential [game-size input-key objects]
   (let
    [updated-objects
     (reduce
      (fn [new-objects object]
        (let [other-objects (concat new-objects (drop (inc (count new-objects)) objects))
-             updated-object (reduce
-                             (fn [o update-fn]
-                               (let [next-o (update-fn game-size input-key other-objects o)]
-                                 (if (some? next-o) next-o (reduced nil))))
-                             object
-                             (:update-fns object))]
+             updated-object (update-object game-size input-key other-objects object)]
          (if (some? updated-object)
            (cons updated-object new-objects)
            new-objects)))
      []
      objects)]
     (vec updated-objects)))
+
+(defn update-objects [game-size input-key objects]
+  (->>
+    objects
+    (map (fn [object] (update-object game-size input-key (without-object objects object) object)))
+    (filter some?)
+    vec))
 
 (defn update-tick2
   ([game-size input-key objects] (update-tick2 game-size input-key objects 1.0))
