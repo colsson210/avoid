@@ -41,37 +41,30 @@
     {:v1-next (vector-plus vt1 vn2)
      :v2-next (vector-plus vt2 vn1)}))
 
-(defn collision-time [[px1 py1] [vx1 vy1] r1 [px2 py2] [vx2 vy2] r2]
-  (let [cx (- px2 px1)
-        cy (- py2 py1)
-        vx (- vx2 vx1)
-        vy (- vy2 vy1)
-        r (+ r1 r2)
-        r-square (square r)
-        a (* -1.0 (+ (* cx vx) (* cy vy)))
-        b (Math/sqrt (- (* (square r) (+ (square vx) (square vy))) (square (- (* cx vy) (* cy vx)))))
-        c (/ 1.0 (+ (square vx) (square vy)))
-        t1 (* c (- a b))
-        t2 (* c (+ a b))
-        valid-times (filter (partial <= 0.0) [t1 t2])]
-        ; (println t1 t2)
-    (if (and false (<= (+ (square cx) (square cy)) r-square))
-      0.0
-      (if (not (empty? valid-times)) (apply min valid-times)))))
+(defn overlapping-any? [other-objects {:keys [id position radius]}]
+  (some?
+   (some (fn [{other-id :id other-position :position other-radius :radius}]
+           (and (not= id other-id)
+                (< (position-distance position other-position) (+ radius other-radius))))
+         other-objects)))
 
-(defn collision-times [[px1 py1] [vx1 vy1] r1 [px2 py2] [vx2 vy2] r2]
-  (let [cx (- px2 px1)
-        cy (- py2 py1)
-        vx (- vx2 vx1)
-        vy (- vy2 vy1)
-        r (+ r1 r2)
-        r-square (square r)
-        v-squares-sum (+ (square vx) (square vy))
-        b-sqrt-input (- (* r-square v-squares-sum) (square (- (* cx vy) (* cy vx))))]
-    (if (and (> v-squares-sum 0.0) (> b-sqrt-input 0.0))
-      (let [a (* -1.0 (+ (* cx vx) (* cy vy)))
-            b (Math/sqrt b-sqrt-input)
-            c (/ 1.0 v-squares-sum)
-            t1 (* c (- a b))
-            t2 (* c (+ a b))]
-        [t1 t2]))))
+(defn without-object [objects {:keys [id]}]
+  (filter (comp (partial not= id) :id) objects))
+
+(defn distance [& circles]
+  (let [sides-length (apply + (apply (partial map (comp square -)) (map :position circles)))
+        h-length (apply (comp square +) (map :radius circles))]
+    (- sides-length h-length)))
+
+
+(defn find-opening-for-circle
+      ([[width height] radius objects] (find-opening-for-circle [width height] radius objects 0))
+      ([[width height] radius objects attempts]
+       (let [position
+             [(+ radius (rand-int (- width (* 2 radius)))) (+ radius (rand-int (- height (* 2 radius))))]]
+         (if (not (overlapping-any? objects {:position position :radius radius :id (gensym)}))
+           position
+           (if (< attempts 10)
+             (find-opening-for-circle [width height] radius objects (inc attempts)))))))
+    
+             

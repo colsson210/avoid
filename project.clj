@@ -5,5 +5,6 @@
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[org.clojure/clojure "1.9.0"]
                  [org.clojure/math.combinatorics "0.1.4"]
-                 [quil "2.7.1"]]
+                 [quil "2.7.1"]
+                 [uncomplicate/neanderthal "0.20.4"]]
   :main avoid.core)

@@ -1,6 +1,6 @@
 (ns avoid.destroy)
 
-(defn create-destroy-fn [pred]
+(defn create-fn [pred]
   (fn [game-size input-key other-objects object]
     (if
      (pred {:game-size game-size
@@ -9,8 +9,8 @@
             :object object})
       object)))
 
-(defmacro create-destroy [& body]
-  `(create-destroy-fn
+(defmacro create [& body]
+  `(create-fn
     (fn [{:keys [~'game ~'input-key ~'other-objects ~'object]}]
       (let [{:keys [~'direction ~'position ~'radius ~'color]} ~'object]
         (if (not (do ~@body)) ~'object)))))
