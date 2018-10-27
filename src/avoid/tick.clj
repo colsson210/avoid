@@ -68,4 +68,5 @@
 (defn tick [game-size input-key objects]
   (->>
    (tick-step game-size input-key objects)
-   (object/add-random-circle game-size)))
+   (object/add-random-circle game-size)
+   ))

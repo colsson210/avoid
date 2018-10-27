@@ -1,0 +1,6 @@
+{
+  "position": [100, 100],
+  "direction": [1, 1],
+  "radius": 20,
+  "color": [255, 255, 100]
+}

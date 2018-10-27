@@ -2,12 +2,14 @@
   (:require [avoid.quiladapter :as quiladapter]
             [avoid.tick :as tick]
             [avoid.settings :as settings]
-            [avoid.object :as object]))
+            [avoid.object :as object]
+            [avoid.updatefns :as updatefns]
+            [avoid.destroyfns :as destroyfns]))
 
 (def initial-state
   (object/add-random-circle
    [settings/window-width settings/window-height]
-   [(object/create-player [255 255 100])]))
+   [(object/create-player)]))
 
 (defn update-state [state key]
   (let [key (quiladapter/get-key-input)]
