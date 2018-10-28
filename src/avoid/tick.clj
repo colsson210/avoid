@@ -1,6 +1,5 @@
 (ns avoid.tick
   (:require [avoid.util :as util]
-            [avoid.object :as object]
             [avoid.collision :as collision]))
 
 (defn move [[width height] step {:keys [radius position direction] :as object}]
@@ -65,8 +64,8 @@
        updated-objects (update-objects game-size input-key moved-objects)]
        (tick-step game-size nil updated-objects (- time-left time-step))))))
 
-(defn tick [game-size input-key objects]
+(defn tick [game-size remove-objects add-objects input-key objects]
   (->>
    (tick-step game-size input-key objects)
-   (object/add-random-circle game-size)
-   ))
+   remove-objects
+   add-objects))

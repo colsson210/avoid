@@ -4,10 +4,9 @@
             [avoid.util :as util]
             [clojure.data.json :as json]))
 
-
 (defn resolve-symbol [x]
-  (println x (symbol x) (resolve (symbol x)) *ns*)
-  ((comp resolve symbol) x))
+  ; (println x (symbol x) (ns-resolve 'avoid.object (symbol x)) *ns*)
+  ((comp (partial ns-resolve 'avoid.object) symbol) x))
 
 (defn read-template [json-filename]
   (json/read-str
@@ -24,22 +23,20 @@
 (println player-initial-state)
 
 (defn create [& object-fields]
-  (apply (partial merge {:id (gensym)}) object-fields))
+  (let [object (apply (partial merge {:id (gensym) :color [255 255 255]}) object-fields)]
+    (assert (every? (partial contains? object) [:id :color :position :direction :radius :update-fns]))
+    object))
 
 (defn create-player []
   (create player-initial-state player))
 
-(defn create-circle [position radius]
-  (create
-   (merge
-    {:position position :radius radius :color [255 100 100]}
-    falling-circle)))
-
 (defn add-random-circle [game-size objects]
   (if (>= (count objects) 10)
     objects
-    (let [radius 10 color [255 100 255]
+    (let [radius 10
           position (util/find-opening-for-circle game-size radius objects)]
       (if (some? position)
-        (cons (create-circle position radius) objects)
+        (cons
+         (create falling-circle {:position position :radius radius})
+         objects)
         objects))))
