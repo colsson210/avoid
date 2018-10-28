@@ -31,7 +31,7 @@
    (let [game (game/read-template game-json)
          initial-state [(object/create (:player-initial-state game) (:player game))]
          remove-objects identity
-         add-objects (partial object/add-random-circle settings/game-size (:add-objects-template game))
+         add-objects (partial (:add-objects-fn game) settings/game-size (:add-objects-template game))
          lose? (apply partial (:lose-condition-fn game) (:lose-condition-fn-args game))
          win? (constantly false)]
         (println game)

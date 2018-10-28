@@ -1,7 +1,7 @@
 {
   "player": "/home/christian/avoid/src/avoid/objects/player.json",
   "player-initial-state": "/home/christian/avoid/src/avoid/objects/player-initial-state.json",
-  "add-objects-fnx": "addfns/add-random-circle",
+  "add-objects-fn": "addfns/add-random-circle",
   "add-objects-template": "/home/christian/avoid/src/avoid/objects/falling-circle.json",
   "remove-objects": [],
   "win-condition": [],

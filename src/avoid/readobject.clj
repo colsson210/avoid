@@ -7,7 +7,7 @@
             [clojure.data.json :as json]))
 
 (defn resolve-symbol [x]
-  ((comp (partial ns-resolve 'avoid.object) symbol) x))
+  ((comp (partial ns-resolve 'avoid.readobject) symbol) x))
 
 (defn read-template [json-filename]
   (json/read-str
