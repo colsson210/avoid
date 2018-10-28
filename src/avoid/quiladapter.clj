@@ -4,6 +4,8 @@
             [avoid.settings :as settings]
             [avoid.object :as object]))
 
+(defn exit [] (q/exit))
+
 (defn get-key-input []
   (if (q/key-pressed?) (q/key-as-keyword)))
 
@@ -47,4 +49,3 @@
     :draw draw-state
     :features [:keep-on-top]
     :middleware [m/fun-mode]))
-
