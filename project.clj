@@ -9,4 +9,5 @@
                  [quil "2.7.1"]
                 ;  [uncomplicate/neanderthal "0.20.4"]
                  ]
-  :main avoid.core)
+  :main avoid.core
+  :aliases {"avoid" ["run" "/home/christian/avoid/src/avoid/games/avoid-falling.json"]})
