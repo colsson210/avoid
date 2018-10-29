@@ -1,0 +1,8 @@
+{
+  "update-fns": [
+    "updatefns/handle-player-action",
+    "updatefns/decrease-direction",
+    "updatefns/gravity-update",
+    "destroyfns/destoy-on-edge-collision"
+  ]
+}

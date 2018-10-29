@@ -12,6 +12,8 @@
 (defmacro create [& body]
   `(create-fn
     (fn [{:keys [~'game ~'input-key ~'other-objects ~'object]}]
-      (let [{:keys [~'direction ~'position ~'radius ~'color]} ~'object]
+      (let [{:keys [~'direction ~'position ~'radius ~'color]} ~'object
+            [~'game-width ~'game-height] ~'game
+            [~'x ~'y] ~'position]
         (if (not (do ~@body)) ~'object)))))
 

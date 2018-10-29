@@ -31,8 +31,8 @@
    (let [game (game/read-template game-json)
          initial-state [(object/create (:player-initial-state game) (:player game))]
          remove-objects identity
-         add-objects (partial (:add-objects-fn game) settings/game-size (:add-objects-template game))
-         lose? (apply partial (:lose-condition-fn game) (:lose-condition-fn-args game))
+         add-objects (if (:add-objects-fn game) (partial (:add-objects-fn game) settings/game-size (:add-objects-template game)) identity)
+         lose? (if (:lose-condition-fn game) (apply partial (:lose-condition-fn game) (:lose-condition-fn-args game)) (constantly false))
          win? (constantly false)]
         (println game)
      (quiladapter/start

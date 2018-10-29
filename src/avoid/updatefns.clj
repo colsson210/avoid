@@ -47,10 +47,10 @@
    :color
    (let [co (collision/get-collision-object other-objects object 0.1)]
      (if co (:color co) color))))
-
 (def collision-counter
   (update/create
    :collisions
    (if (collision/get-collision-object other-objects object 0.1)
      (do (println "prev collisions" collisions) (inc collisions))
      collisions)))
+(def gravity-update (update/create :direction (gravity direction)))

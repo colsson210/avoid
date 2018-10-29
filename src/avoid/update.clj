@@ -11,5 +11,8 @@
   `(create-fn
     ~update-key
     (fn [{:keys [~'game ~'input-key ~'other-objects ~'object]}]
-      (let [{:keys [~'direction ~'position ~'radius ~'color ~'collisions]} ~'object]
+      (let [{:keys [~'direction ~'position ~'radius ~'color ~'collisions]} ~'object
+            [~'game-width ~'game-height] ~'game
+            [~'x ~'y] ~'position]
         (do ~@body)))))
+
