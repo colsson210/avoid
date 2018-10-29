@@ -34,7 +34,6 @@
          add-objects (if (:add-objects-fn game) (partial (:add-objects-fn game) settings/game-size (:add-objects-template game)) identity)
          lose? (if (:lose-condition-fn game) (apply partial (:lose-condition-fn game) (:lose-condition-fn-args game)) (constantly false))
          win? (constantly false)]
-        (println game)
      (quiladapter/start
       initial-state
       (partial game-tick lose? win? (partial update-state remove-objects add-objects))))))

@@ -58,13 +58,14 @@
 
 
 (defn find-opening-for-circle
-      ([[width height] radius objects] (find-opening-for-circle [width height] radius objects 0))
-      ([[width height] radius objects attempts]
+      ([[[x-min x-max] [y-min y-max]] radius objects] (find-opening-for-circle [[x-min x-max] [y-min y-max]] radius objects 0))
+      ([[[x-min x-max] [y-min y-max]] radius objects attempts]
        (let [position
-             [(+ radius (rand-int (- width (* 2 radius)))) (+ radius (rand-int (- height (* 2 radius))))]]
+             [(+ x-min radius (rand-int (- x-max (+ x-min (* 2 radius)))))
+             (+ y-min radius (rand-int (- y-max ( + y-min (* 2 radius)))))]]
          (if (not (overlapping-any? objects {:position position :radius radius :id (gensym)}))
            position
            (if (< attempts 10)
-             (find-opening-for-circle [width height] radius objects (inc attempts)))))))
+             (find-opening-for-circle [[x-min x-max] [y-min y-max]] radius objects (inc attempts)))))))
     
              

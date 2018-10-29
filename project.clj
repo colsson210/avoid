@@ -10,4 +10,5 @@
                 ;  [uncomplicate/neanderthal "0.20.4"]
                  ]
   :main avoid.core
-  :aliases {"avoid" ["run" "/home/christian/avoid/src/avoid/games/avoid-falling.json"]})
+  :aliases {"avoid" ["run" "/home/christian/avoid/src/avoid/games/avoid-falling.json"]
+  "copter" ["run" "/home/christian/avoid/src/avoid/games/copter.json"]})

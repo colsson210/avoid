@@ -1,11 +1,8 @@
 {
   "player": "/home/christian/avoid/src/avoid/objects/copter-player.json",
   "player-initial-state": "/home/christian/avoid/src/avoid/objects/player-initial-state.json",
-  "add-objects-fn": false,
-  "add-objects-template": false,
-  "objects-initial-state": "",
-  "remove-objects": [],
-  "win-condition": [],
-  "lose-condition-fn": "conditionfns/collisions-above",
-  "lose-condition-fn-args": [10]
+  "add-objects-fn": "addfns/add-random-circle",
+  "add-objects-template": "/home/christian/avoid/src/avoid/objects/left-circle.json",
+  "lose-condition-fn": "conditionfns/no-player",
+  "lose-condition-fn-args": []
 }

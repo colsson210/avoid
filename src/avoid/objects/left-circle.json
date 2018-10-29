@@ -1,0 +1,10 @@
+{
+  "direction": [
+    -1,
+    0
+  ],
+  "update-fns": [
+    "updatefns/color-by-position",
+    "destroyfns/destroy-on-edge-collision"
+  ]
+}

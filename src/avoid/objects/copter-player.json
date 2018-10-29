@@ -4,5 +4,6 @@
     "updatefns/decrease-direction",
     "updatefns/gravity-update",
     "destroyfns/destoy-on-edge-collision"
-  ]
+  ],
+  "type": "player"
 }

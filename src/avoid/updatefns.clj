@@ -15,7 +15,7 @@
       direction)))
 
 (defn gravity [[x y]]
-  [x (max -10.0 (- y 0.1))])
+  [x (max -10.0 (- y 0.01))])
 
 (defn get-color-by-vector [[x y]]
   [(mod x 256) (mod y 256) 255])
@@ -40,7 +40,7 @@
 
 (def handle-player-action (update/create :direction (hpa direction input-key)))
 (def decrease-direction (update/create :direction (util/scalar-vector-multiplication 0.99 direction)))
-(def bounce-edges-update (update/create :direction (bounce-edges game position direction radius)))
+(def bounce-edges-update (update/create :direction (bounce-edges game-size position direction radius)))
 (def color-by-position (update/create :color (get-color-by-vector position)))
 (def take-color-on-collision
   (update/create
