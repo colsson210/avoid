@@ -6,9 +6,10 @@
 (defn value-fn [key value]
   (if (and (string? value) (string/ends-with? value ".json"))
     (readobject/read-template value)
-    (if (string/ends-with? (str key) "-fn")
+    (let [str-key (str key)]
+    (if (or (string/ends-with? str-key "-fn") (string/ends-with? str-key "-pred"))
       (readobject/resolve-symbol value)
-      value)))
+      value))))
 
 (defn read-template [json-filename]
   (json/read-str

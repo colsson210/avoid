@@ -64,8 +64,4 @@
        updated-objects (update-objects game-size input-key moved-objects)]
        (tick-step game-size nil updated-objects (- time-left time-step))))))
 
-(defn tick [game-size remove-objects add-objects input-key objects]
-  (->>
-   (tick-step game-size input-key objects)
-   remove-objects
-   add-objects))
+(defn tick [game-size input-key objects] (tick-step game-size input-key objects))

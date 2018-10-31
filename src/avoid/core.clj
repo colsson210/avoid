@@ -5,13 +5,17 @@
             [avoid.object :as object]
             [avoid.game :as game]))
 
-(defn update-state [remove-objects add-objects state key]
+
+(defn handle-add-objects [add-objects add-objects-pred state]
+  (if (add-objects-pred state) (add-objects state) state))
+
+(defn update-state [remove-objects add-objects add-objects-pred state key]
   (let [key (quiladapter/get-key-input)]
     (settings/key-input-handler key)
     (->>
-     (tick/tick settings/game-size remove-objects add-objects key state)
+     (tick/tick settings/game-size key state)
      remove-objects
-     add-objects)))
+     (handle-add-objects add-objects add-objects-pred))))
 
 (defn game-tick [lose? win? update-state state key]
   (cond
@@ -29,11 +33,15 @@
   ([] (println "Missing argument: game.json"))
   ([game-json]
    (let [game (game/read-template game-json)
-         initial-state [(object/create (:player-initial-state game) (:player game))]
+    {:keys [add-objects player-initial-state player lose-condition-fn lose-condition-fn-args]} game
+         initial-state [(object/create player-initial-state player)]
          remove-objects identity
-         add-objects (if (:add-objects-fn game) (partial (:add-objects-fn game) settings/game-size (:add-objects-template game)) identity)
-         lose? (if (:lose-condition-fn game) (apply partial (:lose-condition-fn game) (:lose-condition-fn-args game)) (constantly false))
+        {:keys [add-objects-fn add-objects-pred add-objects-template add-objects-pred-args]} add-objects
+         add-objects-fn2 (if add-objects-fn (partial add-objects-fn settings/game-size add-objects-template) identity)
+        add-objects-pred2 (if add-objects-pred (apply partial add-objects-pred add-objects-pred-args) (constantly false))
+         lose? (if lose-condition-fn (apply partial lose-condition-fn lose-condition-fn-args) (constantly false))
          win? (constantly false)]
+     (println game)
      (quiladapter/start
       initial-state
-      (partial game-tick lose? win? (partial update-state remove-objects add-objects))))))
+      (partial game-tick lose? win? (partial update-state remove-objects add-objects-fn2 add-objects-pred2))))))
