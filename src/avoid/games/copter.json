@@ -1,14 +1,16 @@
 {
   "player": "/home/christian/avoid/src/avoid/objects/copter-player.json",
   "player-initial-state": "/home/christian/avoid/src/avoid/objects/player-initial-state.json",
-  "add-objects": {
-    "add-objects-fn": "addfns/add-random-circle",
-    "add-objects-pred": "conditionfns/objects-below",
-    "add-objects-pred-args": [
-      2
-    ],
-    "add-objects-template": "/home/christian/avoid/src/avoid/objects/left-circle.json"
-  },
+  "add-objects": [
+    {
+      "add-objects-fn": "addfns/add-random-circle",
+      "add-objects-pred": "conditionfns/objects-below",
+      "add-objects-pred-args": [
+        2
+      ],
+      "add-objects-template": "/home/christian/avoid/src/avoid/objects/left-circle.json"
+    }
+  ],
   "remove-objects": [],
   "win-condition": [],
   "lose-condition-fn": "conditionfns/no-player",

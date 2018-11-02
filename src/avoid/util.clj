@@ -43,8 +43,10 @@
 
 (defn overlapping-any? [other-objects {:keys [id position radius]}]
   (some?
-   (some (fn [{other-id :id other-position :position other-radius :radius}]
-           (and (not= id other-id)
+   (some (fn [{other-id :id other-position :position other-radius :radius other-shape :shape}]
+           (and
+              (= other-shape :circle)
+              (not= id other-id)
                 (< (position-distance position other-position) (+ radius other-radius))))
          other-objects)))
 

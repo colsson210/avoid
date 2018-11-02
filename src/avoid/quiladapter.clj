@@ -16,10 +16,10 @@
     (apply q/fill color)
     (q/ellipse x (- settings/window-height y) draw-radius draw-radius)))
 
-(defn draw-line [[x y] [dx dy]]
+(defn draw-line [[x0 y0] [x1 y1]]
   (q/stroke-weight 3)
   (q/with-translation [0 0])
-  (q/line x (- settings/window-height y) (+ x (* 20 dx)) (- settings/window-height (+ y (* 20 dy)))))
+  (q/line x0 (- settings/window-height y0) x1 (- settings/window-height y1)))
 
 (defn clear-sketch [] (q/background 240))
 
@@ -28,10 +28,10 @@
     (clear-sketch)
     (q/frame-rate @settings/frame-rate)
     (dorun
-     (for [{:keys [position radius color draw from to]} state]
+     (for [{:keys [position radius color shape from to]} state]
        (cond
-        (= draw :circle) (draw-circle position radius color)
-        (= draw :line) (draw-line from to))
+        (= shape :circle) (draw-circle position radius color)
+        (= shape :line) (draw-line from to))
        ))))
 
 (defn setup [initial-state]

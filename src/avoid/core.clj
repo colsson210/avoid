@@ -11,6 +11,17 @@
       (if object-to-add (cons object-to-add state) state))
     state))
 
+(defn handle-add-objects-coll [add-objects-coll state]
+  (reduce
+   (fn [acc-state {:keys [add-objects-fn add-objects-pred add-objects-pred-args add-objects-template]}]
+     (if ((partial apply add-objects-pred add-objects-pred-args) acc-state)
+       (cons
+        (add-objects-fn settings/game-size add-objects-template acc-state)
+        acc-state)
+       acc-state))
+   state
+   add-objects-coll))
+
 (defn update-state [remove-objects add-objects add-objects-pred state key]
   (let [key (quiladapter/get-key-input)]
     (settings/key-input-handler key)

@@ -8,5 +8,5 @@
     "destroyfns/destroy-on-exit-bottom",
     "destroyfns/destroy-on-collision"
   ],
-  "draw": "circle"
+  "shape": "circle"
 }

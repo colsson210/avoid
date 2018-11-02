@@ -3,5 +3,5 @@
   "direction": [0.0, 1.0],
   "radius": 20,
   "color": [255, 255, 100],
-  "draw": "circle"
+  "shape": "circle"
 }

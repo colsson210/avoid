@@ -9,20 +9,26 @@
      :position
      (map (partial max radius) [(min x (- width radius)) (min y (- height radius))]))))
 
-(defn move [[width height] step {:keys [radius position direction] :as object}]
-  (let
-   [[x1 y1] (util/vector-plus
-             position
-             (util/scalar-vector-multiplication step direction))]
-    (assoc
-     object
-     :position
-     (map (partial max radius) [(min x1 (- width radius)) (min y1 (- height radius))]))))
+(defn ensure-within-bounds [bounds {:keys [shape] :as object}]
+  (cond
+    (= shape :circle) (ensure-circle-within-bounds bounds object)
+    :else object))
+
+(defn move [step {:keys [position direction] :as object}]
+  (assoc
+   object
+   :position
+   (util/vector-plus
+    position
+    (util/scalar-vector-multiplication step direction))))
+
+(defn move-within-bounds [game-size step object]
+  (ensure-within-bounds game-size (move step object)))
 
 (defn move-objects [game-size step objects]
   (reduce
    (fn [moved-objects object]
-     (let [moved-object (move game-size step object)]
+     (let [moved-object (move-within-bounds game-size step object)]
        (conj moved-objects (if (util/overlapping-any? (concat moved-objects (nthrest objects (count moved-objects))) moved-object) object moved-object))))
    []
    objects))

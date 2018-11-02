@@ -7,5 +7,5 @@
     "updatefns/take-color-on-collision",
     "updatefns/collision-counter"
   ],
-  "draw": "circle"
+  "shape": "circle"
 }

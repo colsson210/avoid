@@ -6,5 +6,5 @@
     "destroyfns/destroy-on-collision"
   ],
   "type": "player",
-  "draw": "circle"
+  "shape": "circle"
 }

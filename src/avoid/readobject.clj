@@ -12,7 +12,7 @@
 (defn value-fn [key value]
   (cond
     (= key :update-fns) (map resolve-symbol value)
-    (= key :draw) (keyword value)
+    (= key :shape) (keyword value)
     :else value))
 
 (defn read-template [json-filename]
