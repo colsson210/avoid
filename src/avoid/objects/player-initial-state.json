@@ -1,6 +1,7 @@
 {
-  "position": [100, 100],
-  "direction": [1, 1],
+  "position": [250, 250],
+  "direction": [0.0, 1.0],
   "radius": 20,
-  "color": [255, 255, 100]
+  "color": [255, 255, 100],
+  "draw": "circle"
 }

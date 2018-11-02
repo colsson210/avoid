@@ -39,6 +39,8 @@
     :else direction))
 
 (def handle-player-action (update/create :direction (hpa direction input-key)))
+(def handle-player-action-copter
+  (update/create :direction (if (= input-key :up) (util/vector-plus [0 0.1] direction) direction)))
 (def decrease-direction (update/create :direction (util/scalar-vector-multiplication 0.99 direction)))
 (def bounce-edges-update (update/create :direction (bounce-edges game-size position direction radius)))
 (def color-by-position (update/create :color (get-color-by-vector position)))

@@ -9,8 +9,14 @@
 (defn resolve-symbol [x]
   ((comp (partial ns-resolve 'avoid.readobject) symbol) x))
 
+(defn value-fn [key value]
+  (cond
+    (= key :update-fns) (map resolve-symbol value)
+    (= key :draw) (keyword value)
+    :else value))
+
 (defn read-template [json-filename]
   (json/read-str
    (slurp json-filename)
    :key-fn keyword
-   :value-fn (fn [key value] (if (= key :update-fns) (map resolve-symbol value) value))))
+   :value-fn value-fn))

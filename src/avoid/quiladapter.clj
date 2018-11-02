@@ -28,8 +28,11 @@
     (clear-sketch)
     (q/frame-rate @settings/frame-rate)
     (dorun
-     (for [{:keys [position radius color]} state]
-       (draw-circle position radius color)))))
+     (for [{:keys [position radius color draw from to]} state]
+       (cond
+        (= draw :circle) (draw-circle position radius color)
+        (= draw :line) (draw-line from to))
+       ))))
 
 (defn setup [initial-state]
   (q/frame-rate @settings/frame-rate)

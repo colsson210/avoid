@@ -7,5 +7,6 @@
     "updatefns/color-by-position",
     "destroyfns/destroy-on-exit-bottom",
     "destroyfns/destroy-on-collision"
-  ]
+  ],
+  "draw": "circle"
 }

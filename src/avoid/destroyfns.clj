@@ -8,7 +8,7 @@
 (def destroy-on-collision
   (destroy/create (collision/get-collision-object other-objects object 0.1)))
 
-(def destoy-on-edge-collision
+(def destroy-on-edge-collision
   (destroy/create
    (or
     (<= x radius)

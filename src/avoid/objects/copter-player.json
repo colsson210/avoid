@@ -1,9 +1,10 @@
 {
   "update-fns": [
-    "updatefns/handle-player-action",
+    "updatefns/handle-player-action-copter",
     "updatefns/decrease-direction",
     "updatefns/gravity-update",
-    "destroyfns/destoy-on-edge-collision"
+    "destroyfns/destroy-on-collision"
   ],
-  "type": "player"
+  "type": "player",
+  "draw": "circle"
 }

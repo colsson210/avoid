@@ -2,6 +2,13 @@
   (:require [avoid.util :as util]
             [avoid.collision :as collision]))
 
+(defn ensure-circle-within-bounds [[width height] {:keys [radius position] :as circle}]
+  (let [[x y] position]
+    (assoc
+     circle
+     :position
+     (map (partial max radius) [(min x (- width radius)) (min y (- height radius))]))))
+
 (defn move [[width height] step {:keys [radius position direction] :as object}]
   (let
    [[x1 y1] (util/vector-plus
@@ -23,6 +30,8 @@
 (defn update-object [game-size input-key other-objects object]
   (reduce
    (fn [current-object update-fn]
+     (println object)
+     (println update-fn)
      (let [next-object (update-fn game-size input-key other-objects current-object)]
        (if (some? next-object) next-object (reduced nil))))
    object
