@@ -5,16 +5,9 @@
             [avoid.object :as object]
             [avoid.game :as game]))
 
-(defn handle-add-objects [add-objects add-objects-pred state]
-  (if (add-objects-pred state)
-    (let [object-to-add (add-objects state)]
-      (if object-to-add (cons object-to-add state) state))
-    state))
-
 (defn handle-add-objects-coll [add-objects-coll state]
   (reduce
    (fn [acc-state {:keys [add-objects-fn add-objects-pred add-objects-pred-args add-objects-template]}]
-    (println add-objects-fn add-objects-pred add-objects-pred-args add-objects-template)
      (if ((apply partial add-objects-pred add-objects-pred-args) acc-state)
        (cons
         (add-objects-fn settings/game-size add-objects-template acc-state)

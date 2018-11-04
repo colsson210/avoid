@@ -71,3 +71,5 @@
              (find-opening-for-circle [[x-min x-max] [y-min y-max]] radius objects (inc attempts)))))))
     
              
+
+             (def pos-number? (comp some? pos?))

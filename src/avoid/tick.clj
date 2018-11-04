@@ -36,8 +36,6 @@
 (defn update-object [game-size input-key other-objects object]
   (reduce
    (fn [current-object update-fn]
-     (println object)
-     (println update-fn)
      (let [next-object (update-fn game-size input-key other-objects current-object)]
        (if (some? next-object) next-object (reduced nil))))
    object
