@@ -1,0 +1,13 @@
+{
+  "update-fns": [
+    "updatefns/handle-player-action",
+    "updatefns/decrease-direction",
+    "updatefns/gravity-update"
+  ],
+  "type": "player",
+  "shape": "line",
+  "from": [250, 250],
+  "to": [350, 350],
+  "direction": [0.0, 1.0],
+  "color": [255, 255, 100]
+}

@@ -14,13 +14,26 @@
     (= shape :circle) (ensure-circle-within-bounds bounds object)
     :else object))
 
-(defn move [step {:keys [position direction] :as object}]
+(defn move-circle [step {:keys [position direction] :as object}]
   (assoc
    object
    :position
    (util/vector-plus
     position
     (util/scalar-vector-multiplication step direction))))
+
+(defn move-line [step {:keys [from to direction] :as line}]
+  (let [step-direction (util/scalar-vector-multiplication step direction)]
+    (merge
+     line
+     {:from (util/vector-plus from step-direction)
+      :to (util/vector-plus to step-direction)})))
+
+
+(defn move [step {:keys [shape] :as object}]
+  (cond
+    (= shape :circle) (move-circle step object)
+    (= shape :line) (move-line step object)))
 
 (defn move-within-bounds [game-size step object]
   (ensure-within-bounds game-size (move step object)))

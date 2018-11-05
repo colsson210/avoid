@@ -3,16 +3,25 @@
             [avoid.update :as update]
             [avoid.collision :as collision]))
 
-(defn get-direction-after-collision [objects {:keys [position direction] :as object}]
+(defn get-circle-direction-after-circle-collision [objects {:keys [position direction] :as object}]
   (let
    [{c-position :position c-direction :direction} (collision/get-collision-object objects object)]
     (if c-position
-      (:v1-next (util/collide
+      (:v1-next (util/collide-circles
                  position
                  direction
                  c-position
                  c-direction))
       direction)))
+
+(defn get-circle-direction-after-line-collision [{:keys [position direction radius]} {:keys [from to direction]}]
+  (let [line (util/vector-minus to from)
+        normalized-line (util/normalize line)
+        from-to-circle (util/vector-minus position from) ; c
+        from-to-circle-on-line (util/scalar-vector-multiplication (util/dot-product from-to-line normalized-line) line) ; a
+        collision-normal (util/vector-minus from-to-circle from-to-circle-on-line) ; b
+        tangential-direction (util/scalar-vector-multiplication (util/dot-product direction normalized-line) line)]
+    (util/vector-plus collision-normal tangential-direction)))
 
 (defn gravity [[x y]]
   [x (max -10.0 (- y 0.01))])

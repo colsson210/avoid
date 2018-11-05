@@ -28,7 +28,7 @@
 
 (def normalized-direction (comp normalize vector-minus))
 
-(defn collide [p1 v1 p2 v2]
+(defn collide-circles [p1 v1 p2 v2]
   (let
    [n (normalized-direction p1 p2)
     negative-n (scalar-vector-multiplication -1.0 n)

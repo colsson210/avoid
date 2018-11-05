@@ -79,10 +79,11 @@
   ([objects object collision-distance]
    (some
     (fn [other-object]
-      (let [t (collision-time object other-object) d (util/distance object other-object)]
+      (let [t (collision-time object other-object)]
         (and
-         (< (util/distance object other-object) collision-distance)
-         (do (println t) other-object))))
+         (some? t)
+         (< t 1.0)
+         other-object)))
     (util/without-object objects object))))
 
 (defn find-earliest-collision-time [objects]
@@ -111,10 +112,9 @@
       (apply min possible-times))))
 
 (defn edge-collision-time-line [game-size {:keys [from to direction]}]
-  (let [f-times (edge-collision-time-point game-size from direction)
-        t-times (edge-collision-time-point game-size to direction)
-        edge-collision-times (concat f-times t-times)]
-    (if (> (count edge-collision-times) 0) (apply min edge-collision-times))))
+  (let [f-time (edge-collision-time-point game-size from direction)
+        t-time (edge-collision-time-point game-size to direction)]
+    (if (and f-time t-time) (min f-time t-time) (or f-time t-time))))
 
 (defn edge-collision-time [game-size {:keys [shape] :as object}]
   (cond

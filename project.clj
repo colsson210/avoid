@@ -8,7 +8,8 @@
                  [org.clojure/data.json "0.2.6"]
                  [quil "2.7.1"]
                 ;  [uncomplicate/neanderthal "0.20.4"]
-                 ]
+]
   :main avoid.core
   :aliases {"avoid" ["run" "/home/christian/avoid/src/avoid/games/avoid-falling.json"]
-  "copter" ["run" "/home/christian/avoid/src/avoid/games/copter.json"]})
+            "copter" ["run" "/home/christian/avoid/src/avoid/games/copter.json"]
+            "pong" ["run" "/home/christian/avoid/src/avoid/games/pong.json"]})
