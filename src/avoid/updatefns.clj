@@ -18,7 +18,7 @@
   (let [line (util/vector-minus to from)
         normalized-line (util/normalize line)
         from-to-circle (util/vector-minus position from) ; c
-        from-to-circle-on-line (util/scalar-vector-multiplication (util/dot-product from-to-line normalized-line) line) ; a
+        from-to-circle-on-line (util/scalar-vector-multiplication (util/dot-product from-to-circle normalized-line) line) ; a
         collision-normal (util/vector-minus from-to-circle from-to-circle-on-line) ; b
         tangential-direction (util/scalar-vector-multiplication (util/dot-product direction normalized-line) line)]
     (util/vector-plus collision-normal tangential-direction)))

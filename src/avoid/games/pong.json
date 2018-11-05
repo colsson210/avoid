@@ -1,5 +1,6 @@
 {
   "player": "/home/christian/avoid/src/avoid/objects/pong-player.json",
+  "objects-initial-state": ["/home/christian/avoid/src/avoid/objects/bouncing-circle.json"],
   "add-objects": [],
   "remove-objects": [],
   "win-condition": [],

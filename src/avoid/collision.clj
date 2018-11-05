@@ -47,8 +47,7 @@
                line-to
                (util/scalar-vector-multiplication time line-to)))]
          (and (< distance-at-time 0.01) [time])))
-     times))
-  false)
+     times)))
 
 (defn collision-time-circles [{[px1 py1] :position [vx1 vy1] :direction r1 :radius}
                               {[px2 py2] :position [vx2 vy2] :direction r2 :radius}]

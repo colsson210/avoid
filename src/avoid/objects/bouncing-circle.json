@@ -1,0 +1,17 @@
+{
+  "position": [
+    100,
+    100
+  ],
+  "radius": 20,
+  "direction": [
+    0,
+    -1
+  ],
+  "update-fns": [
+    "updatefns/color-by-position",
+    "updatefns/bounce-edges-update"
+  ],
+  "shape": "circle",
+  "color": [0, 255, 0]
+}

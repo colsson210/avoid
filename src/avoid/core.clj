@@ -39,8 +39,8 @@
   ([] (println "Missing argument: game.json"))
   ([game-json]
    (let [game (game/read-template game-json)
-         {:keys [add-objects player-initial-state player lose-condition-fn lose-condition-fn-args]} game
-         initial-state [(object/create player-initial-state player)]
+         {:keys [add-objects player-initial-state player lose-condition-fn lose-condition-fn-args objects-initial-state]} game
+         initial-state (concat [(object/create player-initial-state player)] objects-initial-state)
          lose? (if lose-condition-fn (apply partial lose-condition-fn lose-condition-fn-args) (constantly false))
          win? (constantly false)]
      (println game)
