@@ -2,34 +2,39 @@
   (:require [avoid.util :as util]
             [clojure.math.combinatorics :as combinatorics]))
 
-(defn ct-cl-helper [cp lf lt]
-  (let
-   [cc (- lf cp)
-    c (* cc cc)
-    b (+ (* lf lt) (- (* lf lf)) (* cp lf) (- (* c lt)))
-    aa (- lf lt)
-    a (* cc cc)]
-    {:a a :b b :c c}))
+(defn distance-line-circle [circle-position circle-radius line-from line-to]
+  (let [line (util/vector-minus line-to line-from)
+        c (util/vector-minus circle-position line-from)
+        ct (min 1 (max 0 (/ (util/dot-product line c) (util/square (util/magnitude line)))))
+        dp (util/magnitude
+          (util/vector-minus
+            (util/vector-plus line-from (util/scalar-vector-multiplication ct line))
+            circle-position))
+            d (- dp circle-radius)]
+    d))
 
-(defn distance-l-p-t [fx fy tx ty px py l]
-  (let [x (- (+ fx (* l (- tx fx))) px)
-        y (- (+ fy (* l (- ty fy))) py)]
-    (Math/sqrt (+ (* x x) (* y)))))
+(defn collision-time-line-circle-2 [{line-from :from line-to :to line-direction :direction}
+                                      {circle-position :position circle-direction :direction circle-radius :radius}]
+  (let [line (util/vector-minus line-to line-from)
+        normalized-line (util/normalize line)
+        c (util/vector-minus circle-position line-from)
+        a (util/scalar-vector-multiplication (util/dot-product c normalized-line) line) ; collision-point
+        b (util/vector-minus c a)
+        [ax ay] a
+        [fx fy] line-from
+        [tx ty] line-to
+        ctx (if (not= tx fx) (/ (- ax fx) (- tx fx)))
+        cty (if (not= ty fy) (/ (- ay fy) (- ty fy)))
+        ctxx (if (and (some? ctx) (>= ctx 0.0)) ctx)
+        ctyy (if (and (some? cty) (>= cty 0.0)) cty)
+        ct (if (and ctxx ctyy) (min ctxx ctyy) (or ctxx ctyy))
+        a-on-line? (< (util/magnitude a) (util/magnitude line))]
+    (if (and (some? ct) (< ct 100))
+      (println ct a-on-line?))
+    ct))
 
-(defn distance-line-circle [[cpx cpy] cr [lfx lfy] [ltx lty]]
-  (let
-   [{ax :a bx :b cx :c} (ct-cl-helper cpx lfx ltx)
-    {ay :a by :b cy :c} (ct-cl-helper cpy lfy lty)
-    a (+ ax ay)
-    b (+ bx by)
-    c (- (+ cx cy) (* cr cr))
-    l0 (/ (- (- b) (Math/sqrt (- (* b b) (* 4 a c)))) (* 2 a))
-    l1 (/ (+ (- b) (Math/sqrt (- (* b b) (* 4 a c)))) (* 2 a))
-    l (min (max l0 l1 0) 1.0)]
-    (distance-l-p-t lfx lfy ltx lty cpx cpy l)))
-
-(defn collision-times-line-circle [{line-from :from line-to :to line-direction :direction}
-                                   {circle-position :position circle-direction :direction circle-radius :radius}]
+(defn collision-time-line-circle [{line-from :from line-to :to line-direction :direction}
+                                       {circle-position :position circle-direction :direction circle-radius :radius}]
   (let
    [times (range 0 1 0.01)]
     (some
@@ -38,15 +43,15 @@
              (distance-line-circle
               (util/vector-plus
                circle-position
-               (util/scalar-vector-multiplication time circle-position))
+               (util/scalar-vector-multiplication time circle-direction))
               circle-radius
               (util/vector-plus
                line-from
-               (util/scalar-vector-multiplication time line-from))
+               (util/scalar-vector-multiplication time line-direction))
               (util/vector-plus
                line-to
-               (util/scalar-vector-multiplication time line-to)))]
-         (and (< distance-at-time 0.01) [time])))
+               (util/scalar-vector-multiplication time line-direction)))]
+         (and (< distance-at-time 0.01) time)))
      times)))
 
 (defn collision-time-circles [{[px1 py1] :position [vx1 vy1] :direction r1 :radius}
@@ -70,8 +75,8 @@
 (defn collision-time [{shape1 :shape :as object1} {shape2 :shape :as object2}]
   (cond
     (and (= shape1 :circle) (= shape2 :circle)) (collision-time-circles object1 object2)
-    (and (= shape1 :line) (= shape2 :circle)) (collision-times-line-circle object1 object2)
-    (and (= shape1 :circle) (= shape2 :line)) (collision-time shape2 shape1)))
+    (and (= shape1 :line) (= shape2 :circle)) (collision-time-line-circle object1 object2)
+    (and (= shape1 :circle) (= shape2 :line)) (collision-time object2 object1)))
 
 (defn get-collision-object
   ([objects object] (get-collision-object objects object 0.01))

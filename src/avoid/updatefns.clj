@@ -3,18 +3,15 @@
             [avoid.update :as update]
             [avoid.collision :as collision]))
 
-(defn get-circle-direction-after-circle-collision [objects {:keys [position direction] :as object}]
-  (let
-   [{c-position :position c-direction :direction} (collision/get-collision-object objects object)]
-    (if c-position
-      (:v1-next (util/collide-circles
-                 position
-                 direction
-                 c-position
-                 c-direction))
-      direction)))
+(defn get-circle-direction-after-circle-collision [{other-direction :direction other-position :position} {:keys [position direction]}]
+  (:v1-next
+   (util/collide-circles
+    position
+    direction
+    other-position
+    other-direction)))
 
-(defn get-circle-direction-after-line-collision [{:keys [position direction radius]} {:keys [from to direction]}]
+(defn get-circle-direction-after-line-collision [{:keys [from to direction]} {:keys [position direction radius]}]
   (let [line (util/vector-minus to from)
         normalized-line (util/normalize line)
         from-to-circle (util/vector-minus position from) ; c
@@ -22,6 +19,17 @@
         collision-normal (util/vector-minus from-to-circle from-to-circle-on-line) ; b
         tangential-direction (util/scalar-vector-multiplication (util/dot-product direction normalized-line) line)]
     (util/vector-plus collision-normal tangential-direction)))
+
+(defn get-direction-after-collision [objects {:keys [shape id direction] :as object}]
+  (let
+   [{collision-shape :shape :as collision-object} (collision/get-collision-object objects object)]
+    (if (some? collision-object)
+  (do (println "collision!!")
+      (cond
+        (and (= shape :circle) (= collision-shape :circle)) (get-circle-direction-after-circle-collision collision-object object)
+        (and (= shape :circle) (= collision-shape :line)) (get-circle-direction-after-line-collision collision-object object)
+        :else direction))
+      direction)))
 
 (defn gravity [[x y]]
   [x (max -10.0 (- y 0.01))])
@@ -47,6 +55,7 @@
     (= action :right) (util/vector-plus [0.2 0] direction)
     :else direction))
 
+(def bounce-objects (update/create :direction (get-direction-after-collision other-objects object)))
 (def handle-player-action (update/create :direction (hpa direction input-key)))
 (def handle-player-action-copter
   (update/create :direction (if (= input-key :up) (util/vector-plus [0 0.1] direction) direction)))

@@ -41,11 +41,11 @@
     {:v1-next (vector-plus vt1 vn2)
      :v2-next (vector-plus vt2 vn1)}))
 
-(defn overlapping-any? [other-objects {:keys [id position radius]}]
+(defn overlapping-any? [other-objects {:keys [id position radius shape]}]
   (some?
    (some (fn [{other-id :id other-position :position other-radius :radius other-shape :shape}]
            (and
-              (= other-shape :circle)
+              (= shape :circle) (= other-shape :circle)
               (not= id other-id)
                 (< (position-distance position other-position) (+ radius other-radius))))
          other-objects)))
