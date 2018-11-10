@@ -2,7 +2,8 @@
   "update-fns": [
     "updatefns/handle-player-action",
     "updatefns/decrease-direction",
-    "updatefns/gravity-update"
+    "updatefns/gravity-update",
+    "updatefns/bounce-edges-update"
   ],
   "type": "player",
   "shape": "line",

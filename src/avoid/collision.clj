@@ -7,14 +7,14 @@
         c (util/vector-minus circle-position line-from)
         ct (min 1 (max 0 (/ (util/dot-product line c) (util/square (util/magnitude line)))))
         dp (util/magnitude
-          (util/vector-minus
-            (util/vector-plus line-from (util/scalar-vector-multiplication ct line))
-            circle-position))
-            d (- dp circle-radius)]
+            (util/vector-minus
+             (util/vector-plus line-from (util/scalar-vector-multiplication ct line))
+             circle-position))
+        d (- dp circle-radius)]
     d))
 
 (defn collision-time-line-circle-2 [{line-from :from line-to :to line-direction :direction}
-                                      {circle-position :position circle-direction :direction circle-radius :radius}]
+                                    {circle-position :position circle-direction :direction circle-radius :radius}]
   (let [line (util/vector-minus line-to line-from)
         normalized-line (util/normalize line)
         c (util/vector-minus circle-position line-from)
@@ -34,7 +34,7 @@
     ct))
 
 (defn collision-time-line-circle [{line-from :from line-to :to line-direction :direction}
-                                       {circle-position :position circle-direction :direction circle-radius :radius}]
+                                  {circle-position :position circle-direction :direction circle-radius :radius}]
   (let
    [times (range 0 1 0.01)]
     (some
@@ -53,6 +53,11 @@
                (util/scalar-vector-multiplication time line-direction)))]
          (and (< distance-at-time 0.01) time)))
      times)))
+
+(defn collision-time-polygon-circle [{points :points direction :direction :as polygon} circle]
+  (let [lines (map (fn [from to] {:from from :to to :direction direction}) points (concat (rest points) (list (first points))))]
+    (let [cts (filter some? (map #(collision-time-line-circle % circle) lines))]
+      (if (not (empty? cts)) (apply min cts)))))
 
 (defn collision-time-circles [{[px1 py1] :position [vx1 vy1] :direction r1 :radius}
                               {[px2 py2] :position [vx2 vy2] :direction r2 :radius}]
@@ -75,8 +80,9 @@
 (defn collision-time [{shape1 :shape :as object1} {shape2 :shape :as object2}]
   (cond
     (and (= shape1 :circle) (= shape2 :circle)) (collision-time-circles object1 object2)
-    (and (= shape1 :line) (= shape2 :circle)) (collision-time-line-circle object1 object2)
-    (and (= shape1 :circle) (= shape2 :line)) (collision-time object2 object1)))
+    (and (= shape1 :circle) (= shape2 :line)) (collision-time-line-circle object2 object1)
+    (and (= shape1 :circle) (= shape2 :polygon)) (collision-time-polygon-circle object2 object1)
+    (= shape2 :circle) (collision-time object2 object1)))
 
 (defn get-collision-object
   ([objects object] (get-collision-object objects object 0.01))
@@ -126,5 +132,5 @@
     (= shape :line) (edge-collision-time-line game-size object)))
 
 (defn find-earliest-edge-collision [game-size objects]
-  (let [edge-collision-times (filter util/pos-number? (map (partial edge-collision-time game-size) objects))]
+  (let [edge-collision-times (filter (every-pred some? util/pos-number?) (map (partial edge-collision-time game-size) objects))]
     (if (> (count edge-collision-times) 0) (apply min edge-collision-times))))

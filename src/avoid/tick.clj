@@ -29,11 +29,18 @@
      {:from (util/vector-plus from step-direction)
       :to (util/vector-plus to step-direction)})))
 
+(defn move-polygon [step {:keys [points direction] :as polygon}]
+  (let [step-direction (util/scalar-vector-multiplication step direction)]
+    (assoc
+      polygon
+      :points
+      (map (partial util/vector-plus step-direction) points))))
 
 (defn move [step {:keys [shape] :as object}]
   (cond
     (= shape :circle) (move-circle step object)
-    (= shape :line) (move-line step object)))
+    (= shape :line) (move-line step object)
+    (= shape :polygon) (move-polygon step object)))
 
 (defn move-within-bounds [game-size step object]
   (ensure-within-bounds game-size (move step object)))

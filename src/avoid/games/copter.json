@@ -1,14 +1,25 @@
 {
   "player": "/home/christian/avoid/src/avoid/objects/copter-player.json",
   "player-initial-state": "/home/christian/avoid/src/avoid/objects/player-initial-state.json",
+  "objects-initial-state": [
+    "/home/christian/avoid/src/avoid/objects/copter-terrain.json"
+  ],
   "add-objects": [
     {
       "add-objects-fn": "addfns/add-random-circle",
       "add-objects-pred": "conditionfns/objects-below",
       "add-objects-pred-args": [
-        2
+        0
       ],
       "add-objects-template": "/home/christian/avoid/src/avoid/objects/left-circle.json"
+    },
+    {
+      "add-objects-fn": "addfns/add-roof",
+      "add-objects-pred": "conditionfns/roof-below-width",
+      "add-objects-pred-args": [
+        500
+      ],
+      "add-objects-template": "/home/christian/avoid/src/avoid/objects/copter-terrain.json"
     }
   ],
   "remove-objects": [],

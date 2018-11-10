@@ -1,6 +1,7 @@
 (ns avoid.destroyfns
   (:require [avoid.destroy :as destroy]
-            [avoid.collision :as collision]))
+            [avoid.collision :as collision]
+            [avoid.util :as util]))
 
 (def destroy-on-exit-bottom
   (destroy/create (<= y radius)))
@@ -15,3 +16,11 @@
     (<= y radius)
     (>= x (- game-width radius))
     (>= y (- game-height radius)))))
+
+(def polygon-destroy
+  (destroy/create
+   (or
+    (every?
+     (fn [from to]
+       (util/line-points-within game-size [from to]))
+     points))))

@@ -41,35 +41,40 @@
     {:v1-next (vector-plus vt1 vn2)
      :v2-next (vector-plus vt2 vn1)}))
 
+(defn without-object [objects {:keys [id]}]
+  (filter (comp (partial not= id) :id) objects))
+
 (defn overlapping-any? [other-objects {:keys [id position radius shape]}]
   (some?
    (some (fn [{other-id :id other-position :position other-radius :radius other-shape :shape}]
-           (and
-              (= shape :circle) (= other-shape :circle)
-              (not= id other-id)
-                (< (position-distance position other-position) (+ radius other-radius))))
-         other-objects)))
-
-(defn without-object [objects {:keys [id]}]
-  (filter (comp (partial not= id) :id) objects))
+           (cond
+             (and (= shape :circle) (= other-shape :circle))
+             (< (position-distance position other-position) (+ radius other-radius))
+             :else false))
+         (without-object other-objects {:id id}))))
 
 (defn distance [& circles]
   (let [sides-length (apply + (apply (partial map (comp square -)) (map :position circles)))
         h-length (apply (comp square +) (map :radius circles))]
     (- sides-length h-length)))
 
-
 (defn find-opening-for-circle
-      ([[[x-min x-max] [y-min y-max]] radius objects] (find-opening-for-circle [[x-min x-max] [y-min y-max]] radius objects 0))
-      ([[[x-min x-max] [y-min y-max]] radius objects attempts]
-       (let [position
-             [(+ x-min radius (rand-int (- x-max (+ x-min (* 2 radius)))))
-             (+ y-min radius (rand-int (- y-max ( + y-min (* 2 radius)))))]]
-         (if (not (overlapping-any? objects {:position position :radius radius :id (gensym)}))
-           position
-           (if (< attempts 10)
-             (find-opening-for-circle [[x-min x-max] [y-min y-max]] radius objects (inc attempts)))))))
-    
-             
+  ([[[x-min x-max] [y-min y-max]] radius objects] (find-opening-for-circle [[x-min x-max] [y-min y-max]] radius objects 0))
+  ([[[x-min x-max] [y-min y-max]] radius objects attempts]
+   (let [position
+         [(+ x-min radius (rand-int (- x-max (+ x-min (* 2 radius)))))
+          (+ y-min radius (rand-int (- y-max (+ y-min (* 2 radius)))))]]
+     (if (not (overlapping-any? objects {:position position :radius radius :id (gensym)}))
+       position
+       (if (< attempts 10)
+         (find-opening-for-circle [[x-min x-max] [y-min y-max]] radius objects (inc attempts)))))))
 
-             (def pos-number? (comp some? pos?))
+(def pos-number? (comp some? pos?))
+
+(defn point-within [[width height] [x y]]
+  (and (>= x 0) (<= x width) (>= y 0) (<= y height)))
+
+(defn line-points-within [size [from to]]
+  (and
+   (point-within size from)
+   (point-within size to)))

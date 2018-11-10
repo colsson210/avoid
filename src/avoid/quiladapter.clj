@@ -21,18 +21,25 @@
   (q/with-translation [0 0])
   (q/line x0 (- settings/window-height y0) x1 (- settings/window-height y1)))
 
+(defn draw-polygon [points]
+  (q/fill 100 255 100)
+  (q/begin-shape)
+  (dorun
+   (for [[x y] points]
+     (q/vertex x (- settings/window-height y))))
+  (q/end-shape :close))
+
 (defn clear-sketch [] (q/background 240))
 
 (defn draw-state [state]
   (do
     (clear-sketch)
-    (q/frame-rate @settings/frame-rate)
     (dorun
-     (for [{:keys [position radius color shape from to]} state]
+     (for [{:keys [position radius color shape from to points]} state]
        (cond
-        (= shape :circle) (draw-circle position radius color)
-        (= shape :line) (draw-line from to))
-       ))))
+         (= shape :circle) (draw-circle position radius color)
+         (= shape :line) (draw-line from to)
+         (= shape :polygon) (draw-polygon points))))))
 
 (defn setup [initial-state]
   (q/frame-rate @settings/frame-rate)
