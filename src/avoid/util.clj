@@ -78,3 +78,30 @@
   (and
    (point-within size from)
    (point-within size to)))
+
+(defn get-cave-segments [state]
+  (filter (comp (partial = "cave") :type) state))
+
+(defn get-cave-points [state]
+  (let [cave-segments (get-cave-segments state)
+        shapes (mapcat :shapes cave-segments)
+        points (mapcat :points shapes)]
+    points))
+
+(defn get-cave-shapes [state]
+  (let [cave-segments (get-cave-segments state)
+        shapes (mapcat :shapes cave-segments)]
+    shapes))
+
+(defn get-cave-shapes-at-x [x objects]
+  (let [shapes (get-cave-shapes objects)]
+    (filter
+     (fn [{:keys [points]}] (some (comp (partial = x) first) points))
+     shapes)))
+
+(defn get-cave-max-x [state]
+  (let [cave-segments (get-cave-segments state)
+        shapes (mapcat :shapes cave-segments)
+        points (mapcat :points shapes)
+        xs (map first points)]
+    (if (empty? xs) 0 (apply max xs))))

@@ -1,0 +1,10 @@
+{
+  "shapes": [],
+  "cave-segment-template": "/home/christian/avoid/src/avoid/objects/cave-segment.json",
+  "segment-width": 100,
+  "segment-height": 300,
+  "shape": "shape-coll",
+  "type": "cave",
+  "direction": [0, 0],
+  "update-fns": []
+}

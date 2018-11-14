@@ -40,7 +40,8 @@
   (cond
     (= shape :circle) (move-circle step object)
     (= shape :line) (move-line step object)
-    (= shape :polygon) (move-polygon step object)))
+    (= shape :polygon) (move-polygon step object)
+    :else object))
 
 (defn move-within-bounds [game-size step object]
   (ensure-within-bounds game-size (move step object)))

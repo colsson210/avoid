@@ -6,6 +6,8 @@
             [avoid.game :as game]))
 
 (defn handle-add-objects-coll [add-objects-coll state]
+  (println "handle-add-objects-coll")
+(println state)
   (reduce
    (fn [acc-state {:keys [add-objects-fn add-objects-pred add-objects-pred-args add-objects-template]}]
      (if ((apply partial add-objects-pred add-objects-pred-args) acc-state)
@@ -17,11 +19,12 @@
    add-objects-coll))
 
 (defn update-state [add-objects-coll state key]
-  (let [key (quiladapter/get-key-input)]
-    (settings/key-input-handler key)
-    (->>
-     (tick/tick settings/game-size key state)
-     (handle-add-objects-coll add-objects-coll))))
+  (println "update-state:")
+(println state)
+  (settings/key-input-handler key)
+  (->>
+   (tick/tick settings/game-size key state)
+   (handle-add-objects-coll add-objects-coll)))
 
 (defn game-tick [lose? win? update-state state key]
   (cond
