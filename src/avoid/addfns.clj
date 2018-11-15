@@ -10,7 +10,6 @@
       (object/create template {:position position :radius radius}))))
 
 (defn get-max-y-at-x [x points]
-  (println "points: " points)
   (let [ys (map second (filter (comp (partial = x) first) points))]
     (if (seq ys) (apply max ys))))
 
@@ -19,23 +18,20 @@
     (if (seq ys) (apply min ys))))
 
 (defn create-cave-segment [template start-x start-y-lower start-y-upper]
-(println "start-y-lower: " start-y-lower)
   (let [cave-segment-template (:cave-segment-template template)
         segment-width (:segment-width template)
         segment-height (:segment-height template)
         end-x (+ start-x segment-width)
         end-y-lower (min (- 500 segment-height) (+ start-y-lower -100 (rand-int 200)))
         end-y-upper (+ end-y-lower segment-height)
-        points-upper [[start-x 500] [start-x start-y-upper] [end-x end-y-upper] [end-x 500]]
-        points-lower [[start-x 0] [start-x start-y-lower] [end-x end-y-lower] [end-x 0]]]
+        points-upper [[start-x 500] [start-x start-y-upper] [end-x (min 499 end-y-upper)] [end-x 500]]
+        points-lower [[start-x 0] [start-x start-y-lower] [end-x (max 1 end-y-lower)] [end-x 0]]]
     (object/create
      template
      {:shapes [(object/create cave-segment-template {:points points-lower})
                (object/create cave-segment-template {:points points-upper})]})))
 
 (defn create-cave-segment-addon [template objects]
-  ; (println "create-cave-segment-addon")
-  ; (println objects)
   (if (not-any? (fn [{:keys [type]}] (= type "cave")) objects)
     {:start-x 0
      :start-y-lower 100
@@ -56,8 +52,6 @@
                              (if (and y (> y curr) (> y start-y-lower)) y curr)))
                          (get-min-y-at-x max-x (:points (first cave-shapes-at-x-without-yl)))
                          cave-shapes-at-x-without-yl)]
-      (println "max-x: " max-x start-y-lower start-y-upper cave-shapes-at-x)
-; (println "(get-max-y-at-x max-x (first cave-shapes-at-x))" (get-max-y-at-x max-x (first cave-shapes-at-x)))
       {:start-x max-x
        :start-y-lower start-y-lower
        :start-y-upper start-y-upper})))

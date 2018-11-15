@@ -32,16 +32,24 @@
 (defn move-polygon [step {:keys [points direction] :as polygon}]
   (let [step-direction (util/scalar-vector-multiplication step direction)]
     (assoc
-      polygon
-      :points
-      (map (partial util/vector-plus step-direction) points))))
+     polygon
+     :points
+     (map (partial util/vector-plus step-direction) points))))
 
 (defn move [step {:keys [shape] :as object}]
-  (cond
-    (= shape :circle) (move-circle step object)
-    (= shape :line) (move-line step object)
-    (= shape :polygon) (move-polygon step object)
-    :else object))
+   (cond
+     (= shape :circle) (move-circle step object)
+     (= shape :line) (move-line step object)
+     (= shape :polygon) (move-polygon step object)
+     (= shape :shape-coll)
+     (let
+      [d (:direction object)
+        shape-coll-step-direction (util/scalar-vector-multiplication step (:direction object))]
+      (assoc object :shapes
+        (map
+            (partial move step)
+            (:shapes object))))
+   :else object))
 
 (defn move-within-bounds [game-size step object]
   (ensure-within-bounds game-size (move step object)))
@@ -77,6 +85,8 @@
     (vec updated-objects)))
 
 (defn update-objects [game-size input-key objects]
+  ; (println "objects count: "
+  ;   (map (comp count :shapes) (filter (comp (partial = :shape-coll) :shape) objects)))
   (->>
    objects
    (map

@@ -2,7 +2,7 @@
 
 (defn create [& object-fields]
   (let [object (apply (partial merge {:id (gensym) :color [255 255 255]}) (filter some? object-fields))]
-    (if (= (:shape object) "shape-coll")
+    (if (= (:shape object) :shape-coll)
       (assert (contains? object :shapes))
       (assert (every? (partial contains? object) [:id :color :shape :direction :update-fns]) (str object)))
     (cond
