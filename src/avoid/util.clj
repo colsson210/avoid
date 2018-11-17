@@ -105,3 +105,15 @@
         points (mapcat :points shapes)
         xs (map first points)]
     (if (empty? xs) 0 (apply max xs))))
+
+(defn get-y-at-x [pick-y x points]
+  (reduce
+   (fn [max-y [other-x y]]
+     (if (and (= other-x x) (or (not max-y) (pick-y y max-y)))
+       y
+       max-y))
+   nil
+   points))
+
+(def get-max-y-at-x (partial get-y-at-x >))
+(def get-min-y-at-x (partial get-y-at-x <))

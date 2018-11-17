@@ -9,14 +9,6 @@
     (if (some? position)
       (object/create template {:position position :radius radius}))))
 
-(defn get-max-y-at-x [x points]
-  (let [ys (map second (filter (comp (partial = x) first) points))]
-    (if (seq ys) (apply max ys))))
-
-(defn get-min-y-at-x [x points]
-  (let [ys (map second (filter (comp (partial = x) first) points))]
-    (if (seq ys) (apply min ys))))
-
 (defn create-cave-segment [template start-x start-y-lower start-y-upper]
   (let [cave-segment-template (:cave-segment-template template)
         segment-width (:segment-width template)
@@ -41,16 +33,16 @@
           start-y-lower (reduce
                          (fn [min-max-y val]
                            (let
-                            [y (get-max-y-at-x max-x (:points val))]
+                            [y (util/get-max-y-at-x max-x (:points val))]
                              (if (or (not y) (and y (< y min-max-y))) y min-max-y)))
-                         (get-max-y-at-x max-x (:points (first cave-shapes-at-x)))
+                         (util/get-max-y-at-x max-x (:points (first cave-shapes-at-x)))
                          cave-shapes-at-x)
-          cave-shapes-at-x-without-yl (filter (fn [cs] (not= (get-max-y-at-x max-x cs) start-y-lower)) cave-shapes-at-x)
+          cave-shapes-at-x-without-yl (filter (fn [cs] (not= (util/get-max-y-at-x max-x cs) start-y-lower)) cave-shapes-at-x)
           start-y-upper (reduce
                          (fn [curr val]
-                           (let [y (get-min-y-at-x max-x (:points val))]
+                           (let [y (util/get-min-y-at-x max-x (:points val))]
                              (if (and y (> y curr) (> y start-y-lower)) y curr)))
-                         (get-min-y-at-x max-x (:points (first cave-shapes-at-x-without-yl)))
+                         (util/get-min-y-at-x max-x (:points (first cave-shapes-at-x-without-yl)))
                          cave-shapes-at-x-without-yl)]
       {:start-x max-x
        :start-y-lower start-y-lower

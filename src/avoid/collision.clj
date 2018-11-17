@@ -5,9 +5,7 @@
 (defn distance-line-circle [circle-position circle-radius line-from line-to]
   (let [ll (util/vector-minus line-to line-from)]
     (if (< (util/square (util/magnitude ll)) 0.01)
-    (println "small magnitude: " ll line-from line-to))
-    
-    )
+      (println "small magnitude: " ll line-from line-to)))
   (let [line (util/vector-minus line-to line-from)
         c (util/vector-minus circle-position line-from)
         ct (min 1 (max 0 (/ (util/dot-product line c) (util/square (util/magnitude line)))))
@@ -82,20 +80,21 @@
             t2 (* c (+ a b))]
         (if (pos? t1) t1 (if (pos? t2) t2))))))
 
+(declare collision-time)
+(defn collision-time-shape-coll-circle [shape-coll circle]
+  (reduce (fn [min-time s]
+            (let [ct (collision-time circle s)]
+              (if (or (not min-time) (and ct (< ct min-time))) ct min-time)))
+          nil
+          (:shapes shape-coll)))
+
 (defn collision-time [{shape1 :shape :as object1} {shape2 :shape :as object2}]
-  (let [collision-time-shape-coll-circle
-        (fn [shape-coll circle]
-          (reduce (fn [min-time s]
-                    (let [ct (collision-time circle s)]
-                      (if (or (not min-time) (and ct (< ct min-time))) ct min-time)))
-                  nil
-                  (:shapes shape-coll)))]
-    (cond
-      (and (= shape1 :circle) (= shape2 :circle)) (collision-time-circles object1 object2)
-      (and (= shape1 :circle) (= shape2 :line)) (collision-time-line-circle object2 object1)
-      (and (= shape1 :circle) (= shape2 :polygon)) (collision-time-polygon-circle object2 object1)
-      (and (= shape1 :circle) (= shape2 :shape-coll)) (collision-time-shape-coll-circle object2 object1)
-      (= shape2 :circle) (collision-time object2 object1))))
+  (cond
+    (and (= shape1 :circle) (= shape2 :circle)) (collision-time-circles object1 object2)
+    (and (= shape1 :circle) (= shape2 :line)) (collision-time-line-circle object2 object1)
+    (and (= shape1 :circle) (= shape2 :polygon)) (collision-time-polygon-circle object2 object1)
+    (and (= shape1 :circle) (= shape2 :shape-coll)) (collision-time-shape-coll-circle object2 object1)
+    (= shape2 :circle) (collision-time object2 object1)))
 
 (defn get-collision-object
   ([objects object] (get-collision-object objects object 0.01))
