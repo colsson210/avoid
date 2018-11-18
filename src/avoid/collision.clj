@@ -38,6 +38,7 @@
 
 (defn collision-time-line-circle [{line-from :from line-to :to line-direction :direction}
                                   {circle-position :position circle-direction :direction circle-radius :radius}]
+(println "collision-time-line-circle" line-from line-to circle-direction)
   (let
    [times (range 0 1 0.01)]
     (some
@@ -84,11 +85,13 @@
 (defn collision-time-shape-coll-circle [shape-coll circle]
   (reduce (fn [min-time s]
             (let [ct (collision-time circle s)]
+              (println "ct: " ct)
               (if (or (not min-time) (and ct (< ct min-time))) ct min-time)))
           nil
           (:shapes shape-coll)))
 
 (defn collision-time [{shape1 :shape :as object1} {shape2 :shape :as object2}]
+(println "collision-time")
   (cond
     (and (= shape1 :circle) (= shape2 :circle)) (collision-time-circles object1 object2)
     (and (= shape1 :circle) (= shape2 :line)) (collision-time-line-circle object2 object1)
@@ -115,34 +118,3 @@
        (if (or (not earliest) (and t (< t earliest))) t earliest)))
    nil
    (combinatorics/combinations objects 2)))
-
-(defn edge-collision-time-circle [[width height] {[px py] :position [vx vy] :direction r :radius}]
-  (let
-   [tx (if (> (Math/abs vx) 0)
-         [(/ (- r px) vx) (/ (- (- width px) r) vx)])
-    ty (if (> (Math/abs vy) 0)
-         [(/ (- r py) vy) (/ (- (- height py) r) vy)])
-    possible-times (filter util/pos-number? (concat tx ty))]
-    (if (> (count possible-times) 0)
-      (apply min possible-times))))
-
-(defn edge-collision-time-point [[width height] [x y] [dx dy]]
-  (let [tx (if (> (Math/abs dx) 0.0) [(- (/ x dx)) (/ (- width x) dx)])
-        ty (if (> (Math/abs dy) 0.0) [(- (/ y dy)) (/ (- height y) dy)])
-        possible-times (filter util/pos-number? (concat tx ty))]
-    (if (> (count possible-times) 0)
-      (apply min possible-times))))
-
-(defn edge-collision-time-line [game-size {:keys [from to direction]}]
-  (let [f-time (edge-collision-time-point game-size from direction)
-        t-time (edge-collision-time-point game-size to direction)]
-    (if (and f-time t-time) (min f-time t-time) (or f-time t-time))))
-
-(defn edge-collision-time [game-size {:keys [shape] :as object}]
-  (cond
-    (= shape :circle) (edge-collision-time-circle game-size object)
-    (= shape :line) (edge-collision-time-line game-size object)))
-
-(defn find-earliest-edge-collision [game-size objects]
-  (let [edge-collision-times (filter (every-pred some? util/pos-number?) (map (partial edge-collision-time game-size) objects))]
-    (if (> (count edge-collision-times) 0) (apply min edge-collision-times))))

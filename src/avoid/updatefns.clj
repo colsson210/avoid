@@ -22,6 +22,7 @@
     {:a a :b b :c c}))
 
 (defn get-circle-direction-after-line-collision [{:keys [from to]} {:keys [position direction radius]}]
+(println "get-circle-direction-after-line-collision, direction: " direction)
   (let [line (util/vector-minus to from)
         direction-magnitude (util/magnitude direction)
         normalized-line (util/normalize line)
@@ -38,12 +39,15 @@
       ))))
 
 (defn get-direction-after-collision [objects {:keys [shape id direction] :as object}]
+  (println "get-direction-after-collision, shape:" shape objects)
   (let
-   [{collision-shape :shape :as collision-object} (collision/get-collision-object objects object)]
+   [{collision-shape :shape :as collision-object} (collision/get-collision-object objects object 0.1)]
+    (println "collision-object: " collision-object)
     (if (some? collision-object)
       (cond
         (and (= shape :circle) (= collision-shape :circle)) (get-circle-direction-after-circle-collision collision-object object)
         (and (= shape :circle) (= collision-shape :line)) (get-circle-direction-after-line-collision collision-object object)
+        (and (= shape :circle) (= collision-shape :shape-coll)) (util/scalar-vector-multiplication -1 direction)
         :else direction)
       direction)))
 
@@ -52,27 +56,6 @@
 
 (defn get-color-by-vector [[x y]]
   [(mod x 256) (mod y 256) 255])
-
-(defn bounce-edges-circle [[width height] {[px py] :position [dx dy] :direction radius :radius}]
-  (let [max-x (- width radius) max-y (- height radius)
-        min-x radius min-y radius]
-    [(if (or (<= px min-x) (>= px max-x))
-       (* -1 dx)
-       dx)
-     (if (or (<= py min-y) (>= py max-y))
-       (* -1 dy)
-       dy)]))
-
-(defn bounce-edges-line [[width height] {[fx fy] :from [tx ty] :to [dx dy] :direction}]
-  (let [xs [fx tx] ys [fy ty]]
-    [(if (some (some-fn (partial >= 0) (partial <= width)) xs) (* -1 dx) dx)
-     (if (some (some-fn (partial >= 0) (partial <= height)) ys) (* -1 dy) dy)]))
-
-(defn bounce-edges [game-size {:keys [shape direction] :as object}]
-  (cond
-    (= shape :circle) (bounce-edges-circle game-size object)
-    (= shape :line) (bounce-edges-line game-size object)
-    :else direction))
 
 (defn hpa [direction action]
   (cond
@@ -87,7 +70,6 @@
 (def handle-player-action-copter
   (update/create :direction (if (= input-key :up) (util/vector-plus [0 0.1] direction) direction)))
 (def decrease-direction (update/create :direction (util/scalar-vector-multiplication 0.99 direction)))
-(def bounce-edges-update (update/create :direction (bounce-edges game-size object)))
 (def color-by-position (update/create :color (get-color-by-vector position)))
 (def take-color-on-collision
   (update/create

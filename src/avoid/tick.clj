@@ -51,18 +51,16 @@
             (:shapes object))))
    :else object))
 
-(defn move-within-bounds [game-size step object]
-  (ensure-within-bounds game-size (move step object)))
-
 (defn move-objects [game-size step objects]
   (reduce
    (fn [moved-objects object]
-     (let [moved-object (move-within-bounds game-size step object)]
+     (let [moved-object (move step object)]
        (conj moved-objects (if (util/overlapping-any? (concat moved-objects (nthrest objects (count moved-objects))) moved-object) object moved-object))))
    []
    objects))
 
 (defn update-object [game-size input-key other-objects object]
+(println "update-object" other-objects)
   (reduce
    (fn [current-object update-fn]
      (let [next-object (update-fn game-size input-key other-objects current-object)]
@@ -87,6 +85,7 @@
 (defn update-objects [game-size input-key objects]
   ; (println "objects count: "
   ;   (map (comp count :shapes) (filter (comp (partial = :shape-coll) :shape) objects)))
+(println "update-objects" objects)
   (->>
    objects
    (map
@@ -102,8 +101,7 @@
      objects
      (let
       [earliest-collision-time (collision/find-earliest-collision-time objects)
-       earliest-edge-bounce (collision/find-earliest-edge-collision game-size objects)
-       time-step (apply (partial min time-left) (filter (every-pred some? pos?) [earliest-collision-time earliest-edge-bounce]))
+       time-step (if (some? earliest-collision-time) (min time-left earliest-collision-time) time-left)
        moved-objects (move-objects game-size time-step objects)
        updated-objects (update-objects game-size input-key moved-objects)]
        (tick-step game-size nil updated-objects (- time-left time-step))))))

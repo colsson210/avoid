@@ -3,9 +3,9 @@
   "update-fns": [
     "updatefns/handle-player-action",
     "updatefns/decrease-direction",
-    "updatefns/bounce-edges-update",
     "updatefns/take-color-on-collision",
-    "updatefns/collision-counter"
+    "updatefns/collision-counter",
+    "updatefns/bounce-objects"
   ],
   "shape": "circle"
 }

@@ -10,4 +10,11 @@
       (assert (every? (partial contains? object) [:position :radius]))
       (= (:shape object) :line)
       (assert (every? (partial contains? object) [:from :to])))
-    object))
+    (if (= (:shape object) :shape-coll)
+      (update
+        object
+        :shapes
+        (partial map create))
+    object
+    )
+    ))

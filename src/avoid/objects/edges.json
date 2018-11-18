@@ -1,0 +1,52 @@
+{
+  "shapes": [
+    {
+      "direction": [
+        0.0,
+        0.0
+      ],
+      "from": [0, 0],
+      "to": [0, 500],
+      "update-fns": [],
+      "shape": "line",
+      "type": "edge"
+    },
+    {
+      "direction": [
+        0.0,
+        0.0
+      ],
+      "from": [0, 500],
+      "to": [500, 500],
+      "update-fns": [],
+      "shape": "line",
+      "type": "edge"
+    },
+    {
+      "direction": [
+        0.0,
+        0.0
+      ],
+      "from": [500, 500],
+      "to": [500, 0],
+      "update-fns": [],
+      "shape": "line",
+      "type": "edge"
+    },
+    {
+      "direction": [
+        0.0,
+        0.0
+      ],
+      "from": [500, 0],
+      "to": [0, 0],
+      "update-fns": [],
+      "shape": "line",
+      "type": "edge"
+    }
+  ],
+  "shape": "shape-coll",
+  "type": "edges",
+  "direction": [0.0, 0.0],
+  "update-fns": []
+}

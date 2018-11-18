@@ -11,11 +11,8 @@
 
 (def destroy-on-edge-collision
   (destroy/create
-   (or
-    (<= x radius)
-    (<= y radius)
-    (>= x (- game-width radius))
-    (>= y (- game-height radius)))))
+   (let [collision-object (collision/get-collision-object other-objects object 0.1)]
+    (= (:type collision-object) "edge"))))
 
 (def polygon-destroy
   (destroy/create

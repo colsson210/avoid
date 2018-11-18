@@ -10,7 +10,6 @@
   ],
   "update-fns": [
     "updatefns/color-by-position",
-    "updatefns/bounce-edges-update",
     "updatefns/bounce-objects"
   ],
   "shape": "circle",
