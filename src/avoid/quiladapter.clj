@@ -22,6 +22,7 @@
   (q/line x0 (- settings/window-height y0) x1 (- settings/window-height y1)))
 
 (defn draw-polygon [points]
+  (println "draw-polygon" points)
   (q/fill 100 255 100)
   (q/begin-shape)
   (dorun

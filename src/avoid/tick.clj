@@ -1,51 +1,7 @@
 (ns avoid.tick
   (:require [avoid.util :as util]
+    [avoid.move :as move]
             [avoid.collision :as collision]))
-
-(defn move-circle [step {:keys [position direction] :as object}]
-  (assoc
-   object
-   :position
-   (util/vector-plus
-    position
-    (util/scalar-vector-multiplication step direction))))
-
-(defn move-line [step {:keys [from to direction] :as line}]
-  (let [step-direction (util/scalar-vector-multiplication step direction)]
-    (merge
-     line
-     {:from (util/vector-plus from step-direction)
-      :to (util/vector-plus to step-direction)})))
-
-(defn move-polygon [step {:keys [points direction] :as polygon}]
-  (let [step-direction (util/scalar-vector-multiplication step direction)]
-    (assoc
-     polygon
-     :points
-     (map (partial util/vector-plus step-direction) points))))
-
-(defn move [step {:keys [shape] :as object}]
-  (cond
-    (= shape :circle) (move-circle step object)
-    (= shape :line) (move-line step object)
-    (= shape :polygon) (move-polygon step object)
-    (= shape :shape-coll)
-    (let
-     [d (:direction object)
-      shape-coll-step-direction (util/scalar-vector-multiplication step (:direction object))]
-      (assoc object :shapes
-             (map
-              (partial move step)
-              (:shapes object))))
-    :else object))
-
-(defn move-objects [game-size step objects]
-  (reduce
-   (fn [moved-objects object]
-     (let [moved-object (move step object)]
-       (conj moved-objects (if (util/overlapping-any? (concat moved-objects (nthrest objects (count moved-objects))) moved-object) object moved-object))))
-   []
-   objects))
 
 (defn update-object [game-size input-key other-objects object]
   (reduce
@@ -77,21 +33,7 @@
    (filter some?)
    vec))
 
-(defn tick-step
-  ([game-size input-key objects] (tick-step game-size input-key objects 1.0))
-  ([game-size input-key objects time-left] (tick-step game-size input-key objects time-left 0.0025))
-  ([game-size input-key objects time-left min-tick]
-   (if (< time-left min-tick)
-     objects
-     (let
-      [earliest-collision-time (collision/find-earliest-collision-time objects)
-       time-step (if (some? earliest-collision-time) (min time-left earliest-collision-time) time-left)
-       moved-objects (move-objects game-size time-step objects)
-       updated-objects (update-objects game-size input-key moved-objects)]
-       (tick-step game-size nil updated-objects (- time-left time-step))))))
-
 (defn use-old-positions [old-objects new-objects]
-  (println "use-old-positions")
   (map
    (fn [{:keys [shape position from to shapes] :as old-object} {new-shapes :shapes :as new-object}]
      (cond
@@ -102,22 +44,22 @@
    old-objects
    new-objects))
 
-(defn tick-step2
-  ([game-size input-key objects] (tick-step2 game-size input-key objects 1.0))
-  ([game-size input-key objects time-left] (tick-step2 game-size input-key objects time-left 0.1))
+(defn tick-old-positions-on-collision
+  ([game-size input-key objects] (tick-old-positions-on-collision game-size input-key objects 1.0))
+  ([game-size input-key objects time-left] (tick-old-positions-on-collision game-size input-key objects time-left 0.1))
   ([game-size input-key objects time-left tick-length]
    (if (< time-left tick-length)
      objects
      (let
-      [moved-objects (move-objects game-size tick-length objects)
+      [moved-objects (move/move-objects game-size tick-length objects)
        updated-objects (update-objects game-size input-key moved-objects)
         next-objects (if
          (not (collision/some-collision? updated-objects))
          updated-objects
          (use-old-positions objects updated-objects))
         ]
-       (tick-step2 game-size nil next-objects (- time-left tick-length) tick-length)))))
+       (tick-old-positions-on-collision game-size nil next-objects (- time-left tick-length) tick-length)))))
 
 (defn tick [game-size input-key objects]
-  (let [tick-step-fn tick-step2]
-    (tick-step-fn game-size input-key objects)))
+  (let [tick-fn tick-old-positions-on-collision]
+    (tick-fn game-size input-key objects)))

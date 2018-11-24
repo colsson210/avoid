@@ -50,6 +50,7 @@
        :start-y-upper start-y-upper})))
 
 (defn add-cave-segment [game-size template objects]
+; (println "add-cave-segment" objects)
   (let [{:keys [start-x start-y-lower start-y-upper]}
         (create-cave-segment-addon template objects)]
     (create-cave-segment game-size template start-x start-y-lower start-y-upper)))

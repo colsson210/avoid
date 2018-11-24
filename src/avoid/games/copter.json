@@ -1,7 +1,8 @@
 {
-  "player": "/home/christian/avoid/src/avoid/objects/copter-player.json",
-  "player-initial-state": "/home/christian/avoid/src/avoid/objects/player-initial-state.json",
-  
+  "objects-initial-state": [
+    "/home/christian/avoid/src/avoid/objects/edges.json",
+    "/home/christian/avoid/src/avoid/objects/copter-player.json"
+  ],
   "add-objects": [
     {
       "add-objects-fn": "addfns/create-random-circle",
