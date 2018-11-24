@@ -7,11 +7,11 @@
   (destroy/create (<= y radius)))
 
 (def destroy-on-collision
-  (destroy/create (collision/get-collision-object other-objects object 0.1)))
+  (destroy/create (collision/get-collision-object other-objects object)))
 
 (def destroy-on-edge-collision
   (destroy/create
-   (let [collision-object (collision/get-collision-object other-objects object 0.1)]
+   (let [collision-object (collision/get-collision-object other-objects object)]
     (= (:type collision-object) "edge"))))
 
 (def polygon-destroy

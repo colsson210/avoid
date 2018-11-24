@@ -1,7 +1,7 @@
 (ns avoid.object)
 
 (defn create [& object-fields]
-  (let [object (apply (partial merge {:id (gensym) :color [255 255 255]}) (filter some? object-fields))]
+  (let [object (apply (partial merge {:id (gensym) :color [255 255 255] :direction [0 0] :update-fns []}) (filter some? object-fields))]
     (if (= (:shape object) :shape-coll)
       (assert (contains? object :shapes))
       (assert (every? (partial contains? object) [:id :color :shape :direction :update-fns]) (str object)))
@@ -12,9 +12,7 @@
       (assert (every? (partial contains? object) [:from :to])))
     (if (= (:shape object) :shape-coll)
       (update
-        object
-        :shapes
-        (partial map create))
-    object
-    )
-    ))
+       object
+       :shapes
+       (partial map create))
+      object)))

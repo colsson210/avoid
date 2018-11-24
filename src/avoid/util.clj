@@ -61,13 +61,14 @@
 (defn find-opening-for-circle
   ([[[x-min x-max] [y-min y-max]] radius objects] (find-opening-for-circle [[x-min x-max] [y-min y-max]] radius objects 0))
   ([[[x-min x-max] [y-min y-max]] radius objects attempts]
-   (let [position
-         [(+ x-min radius (rand-int (- x-max (+ x-min (* 2 radius)))))
-          (+ y-min radius (rand-int (- y-max (+ y-min (* 2 radius)))))]]
-     (if (not (overlapping-any? objects {:position position :radius radius :id (gensym)}))
-       position
-       (if (< attempts 10)
-         (find-opening-for-circle [[x-min x-max] [y-min y-max]] radius objects (inc attempts)))))))
+   (if (and (<= x-min x-max) (<= y-min y-max))
+     (let [position
+           [(+ x-min radius (rand-int (- x-max (+ x-min (* 2 radius)))))
+            (+ y-min radius (rand-int (- y-max (+ y-min (* 2 radius)))))]]
+       (if (not (overlapping-any? objects {:position position :radius radius :id (gensym)}))
+         position
+         (if (< attempts 10)
+           (find-opening-for-circle [[x-min x-max] [y-min y-max]] radius objects (inc attempts))))))))
 
 (def pos-number? (comp some? pos?))
 
@@ -117,3 +118,20 @@
 
 (def get-max-y-at-x (partial get-y-at-x >))
 (def get-min-y-at-x (partial get-y-at-x <))
+
+(defn distance-line-circle [circle-position circle-radius line-from line-to]
+  (let [ll (vector-minus line-to line-from)]
+    (if (< (square (magnitude ll)) 0.01)
+      (println "small magnitude: " ll line-from line-to)))
+  (let [line (vector-minus line-to line-from)
+        c (vector-minus circle-position line-from)
+        ct (min 1 (max 0 (/ (dot-product line c) (square (magnitude line)))))
+        dp (magnitude
+            (vector-minus
+             (vector-plus line-from (scalar-vector-multiplication ct line))
+             circle-position))
+        d (- dp circle-radius)]
+    d))
+
+(defn get-line-direction [from to]
+  (map - to from))

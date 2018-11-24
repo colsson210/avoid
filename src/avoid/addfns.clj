@@ -3,31 +3,32 @@
    [avoid.util :as util]
    [avoid.object :as object]))
 
-(defn add-random-circle [[game-width game-height] template objects]
-  (let [radius 10
-        position (util/find-opening-for-circle [[0 game-width] [0 game-height]] radius objects)]
+(defn create-random-circle [[game-width game-height] template objects]
+  (let [radius (get template :radius 10)
+        position (util/find-opening-for-circle [[radius (- game-width radius)] [radius (- game-height radius)]] radius objects)]
     (if (some? position)
-      (object/create template {:position position :radius radius}))))
+      (object/create template {:shape :circle :position position :radius radius}))))
 
-(defn create-cave-segment [template start-x start-y-lower start-y-upper]
+(defn create-cave-segment [[game-width game-height] template start-x start-y-lower start-y-upper]
   (let [cave-segment-template (:cave-segment-template template)
         segment-width (:segment-width template)
         segment-height (:segment-height template)
         end-x (+ start-x segment-width)
-        end-y-lower (min (- 500 segment-height) (+ start-y-lower -100 (rand-int 200)))
+      start-y-lower-tenth (int (/ start-y-lower 10))
+        end-y-lower (min (- game-height segment-height) (+ start-y-lower (- start-y-lower-tenth) (rand-int (* 2 start-y-lower-tenth))))
         end-y-upper (+ end-y-lower segment-height)
-        points-upper [[start-x 500] [start-x start-y-upper] [end-x (min 499 end-y-upper)] [end-x 500]]
-        points-lower [[start-x 0] [start-x start-y-lower] [end-x (max 1 end-y-lower)] [end-x 0]]]
+        points-upper [[start-x game-height] [start-x start-y-upper] [end-x (max 0 (min game-height end-y-upper))] [end-x 500]]
+        points-lower [[start-x 0] [start-x start-y-lower] [end-x (max 0 end-y-lower)] [end-x 0]]]
     (object/create
-     template
-     {:shapes [(object/create cave-segment-template {:points points-lower})
-               (object/create cave-segment-template {:points points-upper})]})))
+     (assoc template :shape :polygon)
+     {:shapes [(object/create cave-segment-template {:points points-lower :shape :polygon})
+               (object/create cave-segment-template {:points points-upper :shape :polygon})]})))
 
 (defn create-cave-segment-addon [template objects]
   (if (not-any? (fn [{:keys [type]}] (= type "cave")) objects)
     {:start-x 0
-     :start-y-lower 100
-     :start-y-upper 400}
+     :start-y-lower 0
+     :start-y-upper (+ (:segment-height template))}
     (let [max-x (util/get-cave-max-x objects)
           cave-shapes-at-x (util/get-cave-shapes-at-x max-x objects)
           start-y-lower (reduce
@@ -51,5 +52,5 @@
 (defn add-cave-segment [game-size template objects]
   (let [{:keys [start-x start-y-lower start-y-upper]}
         (create-cave-segment-addon template objects)]
-    (create-cave-segment template start-x start-y-lower start-y-upper)))
+    (create-cave-segment game-size template start-x start-y-lower start-y-upper)))
 

@@ -2,18 +2,6 @@
   (:require [avoid.util :as util]
             [avoid.collision :as collision]))
 
-(defn ensure-circle-within-bounds [[width height] {:keys [radius position] :as circle}]
-  (let [[x y] position]
-    (assoc
-     circle
-     :position
-     (map (partial max radius) [(min x (- width radius)) (min y (- height radius))]))))
-
-(defn ensure-within-bounds [bounds {:keys [shape] :as object}]
-  (cond
-    (= shape :circle) (ensure-circle-within-bounds bounds object)
-    :else object))
-
 (defn move-circle [step {:keys [position direction] :as object}]
   (assoc
    object
@@ -37,19 +25,19 @@
      (map (partial util/vector-plus step-direction) points))))
 
 (defn move [step {:keys [shape] :as object}]
-   (cond
-     (= shape :circle) (move-circle step object)
-     (= shape :line) (move-line step object)
-     (= shape :polygon) (move-polygon step object)
-     (= shape :shape-coll)
-     (let
-      [d (:direction object)
-        shape-coll-step-direction (util/scalar-vector-multiplication step (:direction object))]
+  (cond
+    (= shape :circle) (move-circle step object)
+    (= shape :line) (move-line step object)
+    (= shape :polygon) (move-polygon step object)
+    (= shape :shape-coll)
+    (let
+     [d (:direction object)
+      shape-coll-step-direction (util/scalar-vector-multiplication step (:direction object))]
       (assoc object :shapes
-        (map
-            (partial move step)
-            (:shapes object))))
-   :else object))
+             (map
+              (partial move step)
+              (:shapes object))))
+    :else object))
 
 (defn move-objects [game-size step objects]
   (reduce
@@ -60,7 +48,6 @@
    objects))
 
 (defn update-object [game-size input-key other-objects object]
-(println "update-object" other-objects)
   (reduce
    (fn [current-object update-fn]
      (let [next-object (update-fn game-size input-key other-objects current-object)]
@@ -83,9 +70,6 @@
     (vec updated-objects)))
 
 (defn update-objects [game-size input-key objects]
-  ; (println "objects count: "
-  ;   (map (comp count :shapes) (filter (comp (partial = :shape-coll) :shape) objects)))
-(println "update-objects" objects)
   (->>
    objects
    (map
@@ -106,4 +90,34 @@
        updated-objects (update-objects game-size input-key moved-objects)]
        (tick-step game-size nil updated-objects (- time-left time-step))))))
 
-(defn tick [game-size input-key objects] (tick-step game-size input-key objects))
+(defn use-old-positions [old-objects new-objects]
+  (println "use-old-positions")
+  (map
+   (fn [{:keys [shape position from to shapes] :as old-object} {new-shapes :shapes :as new-object}]
+     (cond
+       (= shape :circle) (assoc new-object :position position)
+       (= shape :line) (merge new-object {:from from :to to})
+       (= shape :shape-coll) (assoc new-object :shapes 
+        (use-old-positions shapes new-shapes))))
+   old-objects
+   new-objects))
+
+(defn tick-step2
+  ([game-size input-key objects] (tick-step2 game-size input-key objects 1.0))
+  ([game-size input-key objects time-left] (tick-step2 game-size input-key objects time-left 0.1))
+  ([game-size input-key objects time-left tick-length]
+   (if (< time-left tick-length)
+     objects
+     (let
+      [moved-objects (move-objects game-size tick-length objects)
+       updated-objects (update-objects game-size input-key moved-objects)
+        next-objects (if
+         (not (collision/some-collision? updated-objects))
+         updated-objects
+         (use-old-positions objects updated-objects))
+        ]
+       (tick-step2 game-size nil next-objects (- time-left tick-length) tick-length)))))
+
+(defn tick [game-size input-key objects]
+  (let [tick-step-fn tick-step2]
+    (tick-step-fn game-size input-key objects)))

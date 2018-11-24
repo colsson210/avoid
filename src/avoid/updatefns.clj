@@ -22,7 +22,6 @@
     {:a a :b b :c c}))
 
 (defn get-circle-direction-after-line-collision [{:keys [from to]} {:keys [position direction radius]}]
-(println "get-circle-direction-after-line-collision, direction: " direction)
   (let [line (util/vector-minus to from)
         direction-magnitude (util/magnitude direction)
         normalized-line (util/normalize line)
@@ -35,20 +34,22 @@
      direction-magnitude
      (util/normalize
       (util/vector-plus collision-normal direction-on-line)
-      ; collision-normal
       ))))
 
+(defn get-line-direction-after-line-collision [collision-line {:keys [direction] :as line}]
+(util/scalar-vector-multiplication -1 direction))
+
 (defn get-direction-after-collision [objects {:keys [shape id direction] :as object}]
-  (println "get-direction-after-collision, shape:" shape objects)
   (let
-   [{collision-shape :shape :as collision-object} (collision/get-collision-object objects object 0.1)]
-    (println "collision-object: " collision-object)
+   [{collision-shape :shape :as collision-object} (collision/get-collision-object objects object)]
+    (if (some? collision-object) (println "collision-object" collision-object))
     (if (some? collision-object)
       (cond
         (and (= shape :circle) (= collision-shape :circle)) (get-circle-direction-after-circle-collision collision-object object)
         (and (= shape :circle) (= collision-shape :line)) (get-circle-direction-after-line-collision collision-object object)
-        (and (= shape :circle) (= collision-shape :shape-coll)) (util/scalar-vector-multiplication -1 direction)
-        :else direction)
+        (and (= shape :line) (= collision-shape :line))
+        (get-line-direction-after-line-collision collision-object object)
+        :else (util/scalar-vector-multiplication -1 direction))
       direction)))
 
 (defn gravity [[x y]]
@@ -74,12 +75,12 @@
 (def take-color-on-collision
   (update/create
    :color
-   (let [co (collision/get-collision-object other-objects object 0.1)]
+   (let [co (collision/get-collision-object other-objects object)]
      (if co (:color co) color))))
 (def collision-counter
   (update/create
    :collisions
-   (if (collision/get-collision-object other-objects object 0.1)
+   (if (collision/get-collision-object other-objects object)
      (do (println "prev collisions" collisions) (inc collisions))
      collisions)))
 (def gravity-update (update/create :direction (gravity direction)))

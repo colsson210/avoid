@@ -43,10 +43,7 @@
          win? (constantly false)
          initial-state (map object/create objects-initial-state)]
      (println initial-state)
-    (if true
-      (do
-        (quiladapter/start
-          initial-state
-         (partial game-tick lose? win? (partial update-state add-objects)))
-        ))
-      )))
+     (do
+       (quiladapter/start
+        initial-state
+        (partial game-tick lose? win? (partial update-state add-objects)))))))

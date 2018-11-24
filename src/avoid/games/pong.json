@@ -1,7 +1,8 @@
 {
   "objects-initial-state": [
     "/home/christian/avoid/src/avoid/objects/bouncing-circle.json",
-    "/home/christian/avoid/src/avoid/objects/edges.json"
+    "/home/christian/avoid/src/avoid/objects/edges.json",
+    "/home/christian/avoid/src/avoid/objects/pong-player.json"
   ],
   "add-objects": [],
   "remove-objects": [],

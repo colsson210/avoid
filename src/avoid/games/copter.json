@@ -4,7 +4,7 @@
   
   "add-objects": [
     {
-      "add-objects-fn": "addfns/add-random-circle",
+      "add-objects-fn": "addfns/create-random-circle",
       "add-objects-pred": "conditionfns/objects-below",
       "add-objects-pred-args": [
         0
