@@ -41,11 +41,6 @@
              time)))
        times)))
   
-  (defn collision-time-polygon-circle [{points :points direction :direction :as polygon} circle]
-    (let [lines (map (fn [from to] {:from from :to to :direction direction}) points (concat (rest points) (list (first points))))]
-      (let [cts (filter some? (map #(collision-time-line-circle % circle) lines))]
-        (if (not (empty? cts)) (apply min cts)))))
-  
   (defn collision-time-circles [{[px1 py1] :position [vx1 vy1] :direction r1 :radius}
                                 {[px2 py2] :position [vx2 vy2] :direction r2 :radius}]
     (let [cx (- px2 px1)
@@ -76,7 +71,6 @@
     (cond
       (and (= shape1 :circle) (= shape2 :circle)) (collision-time-circles object1 object2)
       (and (= shape1 :circle) (= shape2 :line)) (collision-time-line-circle object2 object1)
-      (and (= shape1 :circle) (= shape2 :polygon)) (collision-time-polygon-circle object2 object1)
       (and (= shape1 :line) (= shape2 :line)) (collision-time-line-line object1 object2)
       (= shape1 :shape-coll) (collision-time-shape-coll-object object1 object2)
       (or (= shape2 :shape-coll) (= shape2 :circle)) (collision-time object2 object1)))

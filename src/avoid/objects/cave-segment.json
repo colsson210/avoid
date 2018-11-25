@@ -1,8 +1,10 @@
 {
-  "direction": [
-    -10.0,
-    0
-  ],
-  "shape": "polygon",
+  "shapes": [],
+  "cave-segment-element-template": "/home/christian/avoid/src/avoid/objects/cave-segment-element.json",
+  "segment-width": 100,
+  "segment-height": 300,
+  "shape": "shape-coll",
+  "type": "cave-segment",
+  "direction": [-0.1, 0],
   "update-fns": []
 }

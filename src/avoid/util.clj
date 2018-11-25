@@ -80,30 +80,45 @@
    (point-within size from)
    (point-within size to)))
 
+(defn distance-line-circle [circle-position circle-radius line-from line-to]
+  (let [[fx fy] line-from [tx ty] line-to]
+    (assert (not (and (= fx tx) (= fy ty))) "line-from cannot be equal to line-to"))
+  (let [line (vector-minus line-to line-from)
+        c (vector-minus circle-position line-from)
+        ct (min 1 (max 0 (/ (dot-product line c) (square (magnitude line)))))
+        dp (magnitude
+            (vector-minus
+             (vector-plus line-from (scalar-vector-multiplication ct line))
+             circle-position))
+        d (- dp circle-radius)]
+    d))
+
+(defn get-line-direction [from to]
+  (map - to from))
+
 (defn get-cave-segments [state]
-  (filter (comp (partial = "cave") :type) state))
+  (filter (comp (partial = "cave-segment") :type) state))
 
-(defn get-cave-points [state]
-  (let [cave-segments (get-cave-segments state)
-        shapes (mapcat :shapes cave-segments)
-        points (mapcat :points shapes)]
-    points))
+(defn get-cave-segment-element-points [cave-segment-element]
+  (mapcat (fn [{:keys [from to]}] [from to]) (:shapes cave-segment-element)))
 
-(defn get-cave-shapes [state]
+(defn get-cave-segment-points [state]
+  (mapcat (comp (partial mapcat get-cave-segment-element-points) :shapes) (get-cave-segments state)))
+
+(defn get-cave-segment-elements [state]
   (let [cave-segments (get-cave-segments state)
         shapes (mapcat :shapes cave-segments)]
     shapes))
 
-(defn get-cave-shapes-at-x [x objects]
-  (let [shapes (get-cave-shapes objects)]
+(defn get-cave-segment-elements-at-x [x objects]
+  (let [cave-segment-elements (get-cave-segment-elements objects)]
     (filter
-     (fn [{:keys [points]}] (some (comp (partial = x) first) points))
-     shapes)))
+     (fn [{:keys [shapes]}]
+       (some (fn [{[fx fy] :from [tx ty] :to}] (or (= fx x) (= tx x))) shapes))
+     cave-segment-elements)))
 
-(defn get-cave-max-x [state]
-  (let [cave-segments (get-cave-segments state)
-        shapes (mapcat :shapes cave-segments)
-        points (mapcat :points shapes)
+(defn get-cave-segment-max-x [state]
+  (let [points (get-cave-segment-points state)
         xs (map first points)]
     (if (empty? xs) 0 (apply max xs))))
 
@@ -118,20 +133,3 @@
 
 (def get-max-y-at-x (partial get-y-at-x >))
 (def get-min-y-at-x (partial get-y-at-x <))
-
-(defn distance-line-circle [circle-position circle-radius line-from line-to]
-  (let [ll (vector-minus line-to line-from)]
-    (if (< (square (magnitude ll)) 0.01)
-      (println "small magnitude: " ll line-from line-to)))
-  (let [line (vector-minus line-to line-from)
-        c (vector-minus circle-position line-from)
-        ct (min 1 (max 0 (/ (dot-product line c) (square (magnitude line)))))
-        dp (magnitude
-            (vector-minus
-             (vector-plus line-from (scalar-vector-multiplication ct line))
-             circle-position))
-        d (- dp circle-radius)]
-    d))
-
-(defn get-line-direction [from to]
-  (map - to from))

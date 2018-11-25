@@ -14,10 +14,3 @@
    (let [collision-object (collision/get-collision-object other-objects object)]
     (= (:type collision-object) "edge"))))
 
-(def polygon-destroy
-  (destroy/create
-   (or
-    (every?
-     (fn [from to]
-       (util/line-points-within game-size [from to]))
-     points))))

@@ -69,7 +69,7 @@
 (def bounce-objects (update/create :direction (get-direction-after-collision other-objects object)))
 (def handle-player-action (update/create :direction (hpa direction input-key)))
 (def handle-player-action-copter
-  (update/create :direction (if (= input-key :up) (util/vector-plus [0 0.1] direction) direction)))
+  (update/create :direction (if (= input-key :up) (util/vector-plus [0 0.4] direction) direction)))
 (def decrease-direction (update/create :direction (util/scalar-vector-multiplication 0.99 direction)))
 (def color-by-position (update/create :color (get-color-by-vector position)))
 (def take-color-on-collision

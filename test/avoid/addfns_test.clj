@@ -19,7 +19,7 @@
 (deftest create-cave-segment-test
   (testing "create a cave segment"
     (let
-     [template {:cave-segment-template {} :segment-width 10 :segment-height 10}
+     [template {:cave-segment-element-template {} :segment-width 10 :segment-height 10}
       start-x 0
       start-y-lower 0
       start-y-upper 100
@@ -36,7 +36,7 @@
 
 (deftest add-cave-segment-test
   (testing "add a cave segment"
-    (let [template {:cave-segment-template {} :segment-width 10 :segment-height 10}
+    (let [template {:cave-segment-element-template {} :segment-width 10 :segment-height 10}
           game-size [100 100]
           objects []
           cave-segment (addfns/add-cave-segment game-size template objects)]

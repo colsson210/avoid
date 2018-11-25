@@ -18,7 +18,7 @@
       "add-objects-pred-args": [
         500
       ],
-      "add-objects-template": "/home/christian/avoid/src/avoid/objects/copter-cave.json"
+      "add-objects-template": "/home/christian/avoid/src/avoid/objects/cave-segment.json"
     }
   ],
   "remove-objects": [],

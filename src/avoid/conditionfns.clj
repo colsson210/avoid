@@ -12,4 +12,4 @@
   (not-any? (comp (partial = "player") :type) state))
 
 (defn cave-segment-below-width [width state]
-  (< (util/get-cave-max-x state) width))
+  (< (util/get-cave-segment-max-x state) width))

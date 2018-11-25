@@ -1,0 +1,10 @@
+{
+  "direction": [
+    -10.0,
+    0
+  ],
+  "shape": "shape-coll",
+  "draw-as": "polygon",
+  "type": "cave-segment-element",
+  "update-fns": []
+}

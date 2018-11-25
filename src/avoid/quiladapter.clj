@@ -22,7 +22,6 @@
   (q/line x0 (- settings/window-height y0) x1 (- settings/window-height y1)))
 
 (defn draw-polygon [points]
-  (println "draw-polygon" points)
   (q/fill 100 255 100)
   (q/begin-shape)
   (dorun
@@ -30,12 +29,17 @@
      (q/vertex x (- settings/window-height y))))
   (q/end-shape :close))
 
-(defn draw-shape [{:keys [position radius color shape from to points shapes]}]
+(defn draw-polygon-lines [lines]
+  (let [points (mapcat (fn [{:keys [from to]}] [from to]) lines)]
+    (dorun (draw-polygon points))))
+
+(defn draw-shape [{:keys [position radius color shape from to points shapes draw-as]}]
   (dorun
     (cond
       (= shape :circle) (draw-circle position radius color)
       (= shape :line) (draw-line from to)
-      (= shape :polygon) (draw-polygon points)
+      (and (= shape :shape-coll) (= draw-as "polygon"))
+        (draw-polygon-lines shapes)
       (= shape :shape-coll)
        (dorun (for [s shapes] (draw-shape s))))))
 
