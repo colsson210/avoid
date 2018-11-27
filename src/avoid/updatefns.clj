@@ -33,11 +33,10 @@
     (util/scalar-vector-multiplication
      direction-magnitude
      (util/normalize
-      (util/vector-plus collision-normal direction-on-line)
-      ))))
+      (util/vector-plus collision-normal direction-on-line)))))
 
 (defn get-line-direction-after-line-collision [collision-line {:keys [direction] :as line}]
-(util/scalar-vector-multiplication -1 direction))
+  (util/scalar-vector-multiplication -1 direction))
 
 (defn get-direction-after-collision [objects {:keys [shape id direction] :as object}]
   (let
@@ -52,23 +51,26 @@
         :else (util/scalar-vector-multiplication -1 direction))
       direction)))
 
-(defn gravity [[x y]]
-  [x (max -10.0 (- y 0.01))])
+(defn gravity
+  ([direction] (gravity direction 0.01))
+  ([[x y] y-decrease]
+   [x (max -10.0 (- y y-decrease))]))
 
 (defn get-color-by-vector [[x y]]
   [(mod x 256) (mod y 256) 255])
 
 (defn hpa [direction action]
-  (cond
-    (= action :up) (util/vector-plus [0 0.2] direction)
-    (= action :down) (util/vector-plus [0 -0.2] direction)
-    (= action :left) (util/vector-plus [-0.2 0] direction)
-    (= action :right) (util/vector-plus [0.2 0] direction)
-    :else direction))
+  (let [step 1.0]
+    (cond
+      (= action :up) (util/vector-plus [0 step] direction)
+      (= action :down) (util/vector-plus [0 (- step)] direction)
+      (= action :left) (util/vector-plus [(- step) 0] direction)
+      (= action :right) (util/vector-plus [step 0] direction)
+      :else direction)))
 
 (def bounce-objects (update/create :direction (get-direction-after-collision other-objects object)))
 (def handle-player-action (update/create :direction (hpa direction input-key)))
-(def handle-player-action-copter
+(def copter-handle-player-input
   (update/create :direction (if (= input-key :up) (util/vector-plus [0 0.4] direction) direction)))
 (def decrease-direction (update/create :direction (util/scalar-vector-multiplication 0.99 direction)))
 (def color-by-position (update/create :color (get-color-by-vector position)))
@@ -84,3 +86,6 @@
      (do (println "prev collisions" collisions) (inc collisions))
      collisions)))
 (def gravity-update (update/create :direction (gravity direction)))
+
+(def copter-gravity
+  (update/create :direction (gravity direction 0.02)))

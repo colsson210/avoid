@@ -33,12 +33,12 @@
   (let [points (mapcat (fn [{:keys [from to]}] [from to]) lines)]
     (dorun (draw-polygon points))))
 
-(defn draw-shape [{:keys [position radius color shape from to points shapes draw-as]}]
+(defn draw-shape [{:keys [position radius color shape from to points shapes type]}]
   (dorun
     (cond
       (= shape :circle) (draw-circle position radius color)
       (= shape :line) (draw-line from to)
-      (and (= shape :shape-coll) (= draw-as "polygon"))
+      (and (= shape :shape-coll) (= type "shape-coll-polygon"))
         (draw-polygon-lines shapes)
       (= shape :shape-coll)
        (dorun (for [s shapes] (draw-shape s))))))

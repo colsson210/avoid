@@ -1,8 +1,8 @@
 {
   "update-fns": [
-    "updatefns/handle-player-action-copter",
+    "updatefns/copter-handle-player-input",
     "updatefns/decrease-direction",
-    "updatefns/gravity-update",
+    "updatefns/copter-gravity",
     "destroyfns/destroy-on-collision"
   ],
   "type": "player",

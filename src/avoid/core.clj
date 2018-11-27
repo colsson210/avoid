@@ -7,12 +7,17 @@
 
 (defn handle-add-objects-coll [add-objects-coll state]
   (reduce
-   (fn [acc-state {:keys [add-objects-fn add-objects-pred add-objects-pred-args add-objects-template]}]
-     (if ((apply partial add-objects-pred add-objects-pred-args) acc-state)
-       (cons
-        (add-objects-fn settings/game-size add-objects-template acc-state)
-        acc-state)
-       acc-state))
+   (fn [acc-state {:keys [add-objects-template add-objects-fn add-objects-preds]}]
+     (let [preds
+           (map
+            (fn [{:keys [add-objects-pred add-objects-pred-args]}]
+              (apply partial add-objects-pred add-objects-pred-args))
+            add-objects-preds)]
+       (if ((apply every-pred preds) acc-state)
+         (cons
+          (add-objects-fn settings/game-size add-objects-template acc-state)
+          acc-state)
+         acc-state)))
    state
    add-objects-coll))
 

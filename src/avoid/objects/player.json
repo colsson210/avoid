@@ -5,7 +5,10 @@
     "updatefns/decrease-direction",
     "updatefns/take-color-on-collision",
     "updatefns/collision-counter",
-    "updatefns/bounce-objects"
+    "updatefns/gravity-update"
   ],
+  "position": [250, 250],
+  "direction": [0.0, 1.0],
+  "radius": 20,
   "shape": "circle"
 }

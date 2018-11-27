@@ -12,5 +12,13 @@
 (def destroy-on-edge-collision
   (destroy/create
    (let [collision-object (collision/get-collision-object other-objects object)]
-    (= (:type collision-object) "edge"))))
+     (= (:type collision-object) "edge"))))
 
+(def destroy-on-cave-max-x-below-0
+  (destroy/create
+   (->>
+    shapes
+    (mapcat util/get-cave-segment-element-points)
+    (map first)
+    (apply max)
+    (> 0))))

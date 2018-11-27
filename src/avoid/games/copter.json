@@ -5,20 +5,35 @@
   ],
   "add-objects": [
     {
-      "add-objects-fn": "addfns/create-random-circle",
-      "add-objects-pred": "conditionfns/objects-below",
-      "add-objects-pred-args": [
-        0
-      ],
-      "add-objects-template": "/home/christian/avoid/src/avoid/objects/left-circle.json"
+      "add-objects-template": "/home/christian/avoid/src/avoid/objects/copter-obstacle.json",
+      "add-objects-fn": "addfns/create-copter-obstacle",
+      "add-objects-preds": [
+        {
+          "add-objects-pred": "conditionfns/object-type-count-below-limit",
+          "add-objects-pred-args": [
+            "copter-obstacle",
+            1
+          ]
+        },
+        {
+          "add-objects-pred": "conditionfns/cave-segment-max-x-above",
+          "add-objects-pred-args": [
+            500
+          ]
+        }
+      ]
     },
     {
+      "add-objects-template": "/home/christian/avoid/src/avoid/objects/cave-segment.json",
       "add-objects-fn": "addfns/add-cave-segment",
-      "add-objects-pred": "conditionfns/cave-segment-below-width",
-      "add-objects-pred-args": [
-        500
-      ],
-      "add-objects-template": "/home/christian/avoid/src/avoid/objects/cave-segment.json"
+      "add-objects-preds": [
+        {
+          "add-objects-pred": "conditionfns/cave-segment-below-width",
+          "add-objects-pred-args": [
+            500
+          ]
+        }
+      ]
     }
   ],
   "remove-objects": [],

@@ -7,5 +7,6 @@
     "updatefns/color-by-position",
     "destroyfns/destroy-on-edge-collision"
   ],
-  "shape": "circle"
+  "shape": "circle",
+  "type": "left-circle"
 }

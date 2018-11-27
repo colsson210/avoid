@@ -1,6 +1,6 @@
 (ns avoid.conditionfns
   (:require
-    [avoid.util :as util]))
+   [avoid.util :as util]))
 
 (defn collisions-above [limit state]
   (some->> state (some :collisions) (<= limit)))
@@ -13,3 +13,13 @@
 
 (defn cave-segment-below-width [width state]
   (< (util/get-cave-segment-max-x state) width))
+
+(defn object-type-count-below-limit [type limit state]
+  (->>
+   state
+   (filter (comp (partial = type) :type))
+   count
+   (> limit)))
+
+(defn cave-segment-max-x-above [limit state]
+  (> (util/get-cave-segment-max-x state) limit))

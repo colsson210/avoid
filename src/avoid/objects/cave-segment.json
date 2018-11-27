@@ -5,6 +5,6 @@
   "segment-height": 300,
   "shape": "shape-coll",
   "type": "cave-segment",
-  "direction": [-0.1, 0],
-  "update-fns": []
+  "direction": [-20, 0],
+  "update-fns": ["destroyfns/destroy-on-cave-max-x-below-0"]
 }
