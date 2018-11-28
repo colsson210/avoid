@@ -7,8 +7,10 @@
   (let [
     right-most-cave-segment (util/get-rightmost-cave-segment objects)
     x (:end-x right-most-cave-segment)
-    from-y (:end-y-lower right-most-cave-segment)
-    to-y (+ from-y 100)
+    cave-segment-opening-size (- (:end-y-upper right-most-cave-segment) (:end-y-lower right-most-cave-segment))
+    obstacle-height (/ cave-segment-opening-size 5)
+    from-y (+ (:end-y-lower right-most-cave-segment) (rand-int (- cave-segment-opening-size obstacle-height)))
+    to-y (+ from-y obstacle-height)
     direction (:direction right-most-cave-segment)]
     (object/create
       template

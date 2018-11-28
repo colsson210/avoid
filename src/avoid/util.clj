@@ -133,6 +133,12 @@
       (< max-y-a min-y-b)
       (> min-y-a max-y-b))))
 
+(defn shape-overlapping-bounding-box? [bounding-box shape]
+(println [bounding-box shape])
+  (some
+    (partial bounding-boxes-overlapping? bounding-box)
+    (get-bounding-boxes shape)))
+
 (defn shapes-overlapping? [o1 o2]
   (let [bounding-boxes1 (get-bounding-boxes o1)
   bounding-boxes2 (get-bounding-boxes o2)]
