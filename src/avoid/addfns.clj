@@ -43,7 +43,7 @@
           (concat (rest points) (list (first points)))))]
     (map
      (fn [[from to]]
-       (object/create {:shape :line :from from :to to}))
+       (object/create {:shape :line :from from :to to :type "cave-segment-element-line"}))
      point-pairs)))
 
 (defn create-cave-segment-element [cave-segment-element-template points]

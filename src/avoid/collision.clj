@@ -29,14 +29,14 @@
 (defn collision-shape-coll? [shape-coll shape]
   (some (partial collision? shape) (:shapes shape-coll)))
 
-(defn collision? [{shape1 :shape :as object1} {shape2 :shape :as object2}]
+(defn collision? [{shape1 :shape type1 :type :as object1} {shape2 :shape type2 :type :as object2}]
   (cond
     (= shape1 :shape-coll) (collision-shape-coll? shape1 shape2)
     (= shape2 :shape-coll) (collision? shape2 shape1)
     (and (= shape1 :circle) (= shape2 :circle)) (collision-circle-circle? object1 object2)
     (and (= shape1 :line) (= shape2 :line)) (collision-line-line? (:from object1) (:to object1) (:from object2) (:to object2))
     (and (= shape1 :circle) (= shape2 :line)) (collision-circle-line? object1 object2)
-    (= shape2 :circle) (collision? shape2 shape1)))
+    (= shape2 :circle) (collision? object2 object1)))
 
 (defn some-collision? [objects]
   (some (partial apply collision?) (combinatorics/combinations objects 2)))
@@ -47,6 +47,6 @@
      (if (= shape :shape-coll)
        (get-collision-object shapes object)
        (if (collision? object other-object)
-         other-object)))
+         (do other-object))))
    (util/without-object objects object)))
 
