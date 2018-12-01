@@ -1,5 +1,8 @@
 {
-  "update-fns": ["destroyfns/destroy-on-left-of-game"],
+  "update-fns": [
+    "destroyfns/destroy-on-left-of-game",
+    "destroyfns/destroy-on-collision"
+  ],
   "shape": "line",
   "type": "copter-obstacle"
 }

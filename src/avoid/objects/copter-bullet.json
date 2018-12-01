@@ -1,0 +1,10 @@
+{
+  "update-fns": [
+    "destroyfns/destroy-on-collision"
+  ],
+  "type": "bullet",
+  "shape": "circle",
+  "direction": [10.0, 0.0],
+  "radius": 5,
+  "color": [100, 255, 100]
+}

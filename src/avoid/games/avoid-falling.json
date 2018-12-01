@@ -5,12 +5,16 @@
   ],
   "add-objects": [
     {
+      "add-objects-template": "/home/christian/avoid/src/avoid/objects/falling-circle.json",
       "add-objects-fn": "addfns/create-random-circle",
-      "add-objects-pred": "conditionfns/objects-below",
-      "add-objects-pred-args": [
-        10
-      ],
-      "add-objects-template": "/home/christian/avoid/src/avoid/objects/falling-circle.json"
+      "add-objects-preds": [
+        {
+          "add-objects-pred": "conditionfns/objects-below",
+          "add-objects-pred-args": [
+            10
+          ]
+        }
+      ]
     }
   ],
   "remove-objects": [],

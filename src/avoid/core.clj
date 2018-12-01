@@ -5,15 +5,15 @@
             [avoid.object :as object]
             [avoid.game :as game]))
 
-(defn handle-add-objects-coll [add-objects-coll state]
+(defn handle-add-objects-coll [add-objects-coll key state]
   (reduce
    (fn [acc-state {:keys [add-objects-template add-objects-fn add-objects-preds]}]
-     (let [preds
-           (map
+     (let [a-ok
+           (every?
             (fn [{:keys [add-objects-pred add-objects-pred-args]}]
-              (apply partial add-objects-pred add-objects-pred-args))
+              ((apply partial add-objects-pred add-objects-pred-args) acc-state key))
             add-objects-preds)]
-       (if ((apply every-pred preds) acc-state)
+       (if a-ok
          (cons
           (add-objects-fn settings/game-size add-objects-template acc-state)
           acc-state)
@@ -25,15 +25,15 @@
   (settings/key-input-handler key)
   (->>
    (tick/tick settings/game-size key state)
-   (handle-add-objects-coll add-objects-coll)))
+   (handle-add-objects-coll add-objects-coll key)))
 
 (defn game-tick [lose? win? update-state state key]
   (cond
-    (lose? state)
+    (lose? state key)
     (do
       (println "Lose!")
       (quiladapter/exit))
-    (win? state)
+    (win? state key)
     (do
       (println "Win!" state)
       (quiladapter/exit))

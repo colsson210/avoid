@@ -34,6 +34,25 @@
           ]
         }
       ]
+    },
+    {
+      "add-objects-template": "/home/christian/avoid/src/avoid/objects/copter-bullet.json",
+      "add-objects-fn": "addfns/create-copter-bullet",
+      "add-objects-preds": [
+        {
+          "add-objects-pred": "conditionfns/player-pressed",
+          "add-objects-pred-args": [
+            "s"
+          ]
+        },
+        {
+          "add-objects-pred": "conditionfns/object-type-count-below-limit",
+          "add-objects-pred-args":[
+            "bullet",
+            1
+          ]
+        }
+      ]
     }
   ],
   "remove-objects": [],

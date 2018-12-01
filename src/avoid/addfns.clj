@@ -1,11 +1,12 @@
 (ns avoid.addfns
   (:require
    [avoid.util :as util]
-   [avoid.object :as object]))
+   [avoid.object :as object]
+   [avoid.cavesegment :as cavesegment]))
 
 (defn create-copter-obstacle [[game-width game-height] template objects]
   (let [
-    right-most-cave-segment (util/get-rightmost-cave-segment objects)
+    right-most-cave-segment (cavesegment/get-rightmost-cave-segment objects)
     x (:end-x right-most-cave-segment)
     cave-segment-opening-size (- (:end-y-upper right-most-cave-segment) (:end-y-lower right-most-cave-segment))
     obstacle-height (/ cave-segment-opening-size 5)
@@ -21,6 +22,14 @@
         position (util/find-opening-for-circle [[radius (- game-width radius)] [radius (- game-height radius)]] radius objects)]
     (if (some? position)
       (object/create template {:shape :circle :position position :radius radius}))))
+
+
+(defn create-copter-bullet [[game-width game-height] template objects]
+  (let [player (some (fn [o] (and (= (:type o) "player") o)) objects)
+    player-radius (:radius player)
+    [player-x player-y] (:position player)
+    position [(+ player-x player-radius 10) player-y]]
+    (object/create template {:position position})))
 
 (defn create-cave-segment-element-lines [points]
   (let [point-pairs
@@ -74,11 +83,11 @@
       {:start-x 0
        :start-y-lower start-y-lower
        :start-y-upper (+ start-y-lower segment-height)})
-    (let [max-x (util/get-cave-segment-max-x objects)
-          cave-segment-elements (util/get-cave-segment-elements-at-x max-x objects)
+    (let [max-x (cavesegment/get-cave-segment-max-x objects)
+          cave-segment-elements (cavesegment/get-cave-segment-elements-at-x max-x objects)
           start-y-lower (reduce
                          (fn [min-max-y-at-x cave-segment-element]
-                           (let [cave-segment-element-points (util/get-cave-segment-element-points cave-segment-element)
+                           (let [cave-segment-element-points (cavesegment/get-cave-segment-element-points cave-segment-element)
                                  max-y-at-x (util/get-max-y-at-x max-x cave-segment-element-points)]
                              (if
                               (or (not min-max-y-at-x) (and max-y-at-x (< max-y-at-x min-max-y-at-x)))
@@ -88,7 +97,7 @@
                          cave-segment-elements)
           start-y-upper (reduce
                          (fn [max-min-y-at-x cave-segment-element]
-                           (let [cave-segment-element-points (util/get-cave-segment-element-points cave-segment-element)
+                           (let [cave-segment-element-points (cavesegment/get-cave-segment-element-points cave-segment-element)
                                  min-y-at-x (util/get-min-y-at-x max-x cave-segment-element-points)]
                              (if
                               (or (not max-min-y-at-x) (and min-y-at-x (> min-y-at-x max-min-y-at-x)))

@@ -1,7 +1,9 @@
 (ns avoid.destroyfns
   (:require [avoid.destroy :as destroy]
             [avoid.collision :as collision]
-            [avoid.util :as util]))
+            [avoid.util :as util]
+            [avoid.boundingbox :as boundingbox]
+            [avoid.cavesegment :as cavesegment]))
 
 (def destroy-on-exit-bottom
   (destroy/create (<= y radius)))
@@ -18,7 +20,7 @@
   (destroy/create
    (->>
     shapes
-    (mapcat util/get-cave-segment-element-points)
+    (mapcat cavesegment/get-cave-segment-element-points)
     (map first)
     (apply max)
     (> 0))))
@@ -26,13 +28,13 @@
 (def destroy-on-outside-game
   (destroy/create
    (not
-    (util/shape-overlapping-bounding-box?
+    (boundingbox/shape-overlapping-bounding-box?
      {:min-x 0 :max-x game-width :min-y 0 :max-y game-height}
      object))))
 
 (def destroy-on-left-of-game
   (destroy/create
-   (let [bounding-boxes (util/get-bounding-boxes object)
+   (let [bounding-boxes (boundingbox/get-bounding-boxes object)
          total-max-x (reduce
                       (fn [old-max-x {:keys [max-x]}] (if (or (not old-max-x) (> max-x old-max-x)) max-x old-max-x))
                       nil
